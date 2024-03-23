@@ -1,0 +1,20 @@
+[package]
+name = "dxlib"
+version = "0.0.1" # change with html_root_url in lib.rs
+edition = "2021"
+authors = ["nomissbowling <nomissbowling@yahoo.co.jp>"]
+
+description = "dxlib dll for Rust"
+keywords = ["dxlib", "directx", "3d", "opengl"]
+categories = ["development-tools", "graphics", "rendering", "rendering::graphics-api"]
+license = "MIT"
+
+documentation = "https://docs.rs/dxlib/"
+homepage = "https://crates.io/crates/dxlib"
+repository = "https://github.com/nomissbowling/dxlib"
+
+readme = "README.md"
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[dependencies]
