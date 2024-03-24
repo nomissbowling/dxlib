@@ -1,19 +1,30 @@
 //! dx bridge for DxLib
 //!
+//! tested with the version DxLibDotNet3_24b.zip
+//!
 //! must use "for C# DxLib_x64.dll" (no_mangle for C)
 //!
 //! - download "for C# DxLib_x64.dll" from https://dxlib.xsrv.jp/
 //! - dumpbin /exports DxLib_x64.dll &gt; DxLib_x64.def
-//! - edit DxLib_x64.def (see also sample etc/DxLib_x64.def)
+//! - edit DxLib_x64.def ( see also sample etc/DxLib_x64.def )
 //! - lib /machine:x64 /def:DxLib_x64.def /out:DxLib_x64.dll.lib
 //! - copy DxLib_x64.dll.lib .
 //!
+//! ( see also https://docs.rs/crate/dxlib/0.0.1/source/bin/ )
+//!
 //! make bridge "for R DxLib_x64_R.dll" it calls DxLib_x64.dll
 //!
-//! - edit DxLib_x64_R.def (see also sample etc/DxLib_x64_R.def)
+//! - edit DxLib_x64_R.def ( see also sample etc/DxLib_x64_R.def )
 //! - link /machine:x64 /def:DxLib_x64_R.def /noentry /dll /out:DxLib_x64_R.dll /implib:DxLib_x64_R.dll.lib
 //! - copy DxLib_x64_R.dll.lib .
 //! - copy DxLib_x64_R.dll .
+//!
+//! ( see also https://docs.rs/crate/dxlib/0.0.1/source/bin/ )
+//!
+//! compile .hlsl to .vso and .pso by ShaderCompiler distributed with DxLib
+//!
+//! - ShaderCompiler /Tvs_4_0 shader_VS.hlsl
+//! - ShaderCompiler /Tps_4_0 shader_PS.hlsl
 //!
 
 use std::ffi::{c_void};
