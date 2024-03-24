@@ -186,7 +186,7 @@ extern "stdcall" {
   pub fn DxLib_End() -> i32;
   pub fn ChangeWindowMode(Flag: i32) -> i32;
   // int __stdcall SetGraphMode(int ScreenSizeX, int ScreenSizeY,
-  //   int ColorBitDepth, int RefreshRate=60);
+  //   int ColorBitDepth, int RefreshRate=60) -> i32;
   pub fn SetGraphMode(ScreenSizeX: i32, ScreenSizeY: i32,
     ColorBitDepth: i32, RefreshRate: i32) -> i32;
   pub fn SetOutApplicationLogValidFlag(b: i32) -> i32;
@@ -245,12 +245,12 @@ extern "stdcall" {
   pub fn SetTransformToProjection(m: *const MATRIX) -> i32;
 
   pub fn CreatePerspectiveFovMatrix(m: *mut MATRIX,
-    fov: f32, zn: f32, zf: f32, aspect: f32); // default aspect -1.0
+    fov: f32, zn: f32, zf: f32, aspect: f32) -> i32; // default aspect -1.0
   pub fn CreateViewportMatrix(m: *mut MATRIX,
-    cx: f32, cy: f32, w: f32, h: f32);
-  pub fn SetTransformToViewport(m: *const MATRIX);
+    cx: f32, cy: f32, w: f32, h: f32) -> i32;
+  pub fn SetTransformToViewport(m: *const MATRIX) -> i32;
 
-  pub fn DrawPolygon3DToShader(va: *const VERTEX3DSHADER, npolygons: i32);
+  pub fn DrawPolygon3DToShader(va: *const VERTEX3DSHADER, npolygons: i32) -> i32;
 
   pub fn InitFontToHandle() -> i32;
   pub fn DeleteFontToHandle(fh: i32) -> i32;

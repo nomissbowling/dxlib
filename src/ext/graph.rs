@@ -18,6 +18,15 @@ impl Tr for Graph {
   fn draw(&self, x: i32, y: i32, f: i32) {
     unsafe { DrawGraph(x, y, self.h, f); }
   }
+  fn draw_rota(&self, x: i32, y: i32, extrate: f64, angle: f64,
+    trans: i32, reversex: i32, reversey: i32) {
+    unsafe {
+      DrawRotaGraph(x, y, extrate, angle, self.h, trans, reversex, reversey);
+    }
+  }
+  fn set_to_shader(&self, i: i32) {
+    unsafe { SetUseTextureToShader(i, self.h); }
+  }
 }
 
 impl Drop for Graph {

@@ -1,4 +1,4 @@
-#![doc(html_root_url = "https://docs.rs/dxlib/0.0.4")]
+#![doc(html_root_url = "https://docs.rs/dxlib/0.0.5")]
 //! dxlib dll for Rust
 //!
 
@@ -16,7 +16,7 @@ mod tests {
   #[test]
   fn test_screen() {
     // either typ or dum at once
-//    assert_eq!(demo::typ::screen("./resource/").expect("init"), ());
-    assert_eq!(demo::dum::screen("./resource/"), ());
+    assert_eq!(demo::typ::screen("./resource/").expect("init"), ());
+//    assert_eq!(demo::dum::screen("./resource/"), ());
   }
 }
