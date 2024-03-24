@@ -4,7 +4,7 @@
 use std::error::Error;
 use std::path::PathBuf;
 
-use crate::{dx::*, ext::*, demo};
+use crate::{dx::*, ext::*, ext::tdx::Tdx, demo};
 
 pub fn screen(p: &str) -> Result<(), Box<dyn Error>> {
   let vert = demo::gen_vert();
@@ -19,7 +19,8 @@ pub fn screen(p: &str) -> Result<(), Box<dyn Error>> {
   let base = PathBuf::from(p);
   let res: Vec<String> = vec![
     "Fantasie_Impromptu_op66.mid\0",
-    "_decision3_.wav\0",
+    "onestop.mid\0",
+    "ringout.wav\0",
     "_decision3_.wav\0",
     "_img_320x240_0000.png\0",
     "_texture_128x128_0000.bmp\0",
@@ -37,13 +38,53 @@ pub fn screen(p: &str) -> Result<(), Box<dyn Error>> {
   Tdx::set_main_window_text_bytes(u8t);
 
   let mut dx = Tdx::new()?;
-  let sound = dx.load_sound_mem(&res[2]);
-  Tdx::wait_timer(1000);
-  sound.volume(128);
-  sound.play(DX_PLAYTYPE_NORMAL, TRUE);
+  Tdx::init_music_mem();
+  let bgm = dx.load_music_mem(&res[0]);
+  let lps = dx.load_sound_mem(&res[2]);
+  let snd = dx.load_sound_mem(&res[3]);
+  let grp = dx.load_graph(&res[4]);
+  let tex = dx.load_graph(&res[5]);
+  Tdx::init_shader();
+
+  Tdx::init_font_to_handle();
+
+//  println!("bh: {:08x} sh: {:08x} gh: {:08x} fh: {:08x}", bh, sh, gh, fh);
+  println!("bgm: {:08x} lps: {:08x} snd: {:08x} grp: {:08x} tex: {:08x}",
+    bgm.handle(), lps.handle(), snd.handle(), grp.handle(), tex.handle());
+
+  Tdx::select_midi_mode(DX_MIDIMODE_MCI);
+  bgm.volume(96);
+  bgm.play(DX_PLAYTYPE_BACK, TRUE);
+
+  Tdx::set_main_window_text("loop sound\0");
+  lps.volume(96);
+  lps.play(DX_PLAYTYPE_LOOP, TRUE);
+
+  Tdx::set_draw_screen(DX_SCREEN_WORK);
+  Tdx::clear_draw_screen(NULL);
+  Tdx::screen_flip();
+
+  for i in 0..640 {
+    if Tdx::process_message() != 0 { break; }
+    Tdx::clear_draw_screen(NULL);
+    // loss time test draw many pixel
+    for r in 0..240 {
+      for c in 0..320 {
+        Tdx::draw_pixel(160 + c, 120 + r,
+          Tdx::get_color(255 - c / 2, 192 - r / 2, 32));
+      }
+    }
+    grp.draw(i * 4 / 8, i * 3 / 8, TRUE); // transparent
+
+    Tdx::screen_flip();
+  }
+
+  Tdx::set_main_window_text("sound\0");
+  snd.volume(128);
+  snd.play(DX_PLAYTYPE_NORMAL, TRUE);
   Tdx::wait_timer(2000);
-  Tdx::set_main_window_text("end\0");
-  sound.stop();
+  Tdx::set_main_window_text("sound end\0");
+  snd.stop();
 
   Ok(())
 }

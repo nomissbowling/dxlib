@@ -18,7 +18,8 @@ pub fn screen(p: &str) {
   let base = PathBuf::from(p);
   let res: Vec<String> = vec![
     "Fantasie_Impromptu_op66.mid\0",
-    "_decision3_.wav\0",
+    "onestop.mid\0",
+    "ringout.wav\0",
     "_decision3_.wav\0",
     "_img_320x240_0000.png\0",
     "_texture_128x128_0000.bmp\0",
@@ -39,20 +40,20 @@ unsafe {
 
   InitMusicMem();
   let mh = LoadMusicMem(res[0].as_ptr());
-  let bh = LoadSoundMem(res[1].as_ptr()); // should select long wav
-  let sh = LoadSoundMem(res[2].as_ptr()); // should select short wav
-  let gh = LoadGraph(res[3].as_ptr());
-  let txh = LoadGraph(res[4].as_ptr());
+  let bh = LoadSoundMem(res[2].as_ptr()); // should select long wav
+  let sh = LoadSoundMem(res[3].as_ptr()); // should select short wav
+  let gh = LoadGraph(res[4].as_ptr());
+  let txh = LoadGraph(res[5].as_ptr());
   InitShader();
-  let vsh = LoadVertexShader(res[5].as_ptr());
-  let psh = LoadPixelShader(res[6].as_ptr());
-  // let gsh = LoadGeometryShader(resources[7].as_ptr());
+  let vsh = LoadVertexShader(res[6].as_ptr());
+  let psh = LoadPixelShader(res[7].as_ptr());
+  // let gsh = LoadGeometryShader(resources[8].as_ptr());
   InitFontToHandle();
 /*
   let fh = CreateFontToHandle("Arial\0".as_ptr(), 32, 1,
     -1, -1, -1, TRUE, -1); // only system fonts
 */
-  let fh = LoadFontDataToHandle(res[8].as_ptr(), 0); // fixed size italic
+  let fh = LoadFontDataToHandle(res[9].as_ptr(), 0); // fixed size italic
   println!("bh: {:08x} sh: {:08x} gh: {:08x} fh: {:08x}", bh, sh, gh, fh);
 
   SelectMidiMode(DX_MIDIMODE_MCI); // DX_MIDIMODE_DM DX_MIDIMODE_MCI (default)

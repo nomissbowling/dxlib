@@ -1,10 +1,15 @@
 //! ext dx bridge for DxLib
 //!
 
-use std::error::Error;
-use std::collections::HashMap;
+use std::rc::Rc;
+use std::cell::RefCell;
 
 use crate::dx::*;
+
+pub mod music;
+pub mod sound;
+pub mod graph;
+pub mod tdx;
 
 pub trait Tr {
   fn handle(&self) -> i32;
@@ -12,86 +17,16 @@ pub trait Tr {
   fn volume(&self, _v: i32) {} // default do nothing
   fn stop(&self) {} // default do nothing
   fn play(&self, _t: i32, _f: i32) {} // default do nothing
+  fn draw(&self, _x: i32, _y: i32, _f: i32) {} // default do nothing
 }
 
-pub struct Sound {
-  pub h: i32
-}
-
-impl Tr for Sound {
-  fn handle(&self) -> i32 { self.h }
-  fn dispose(&mut self) {
-    if self.h != 0 {
-      unsafe { DeleteSoundMem(self.h, FALSE); }
-      self.h = 0;
-    }
-  }
-  fn volume(&self, v: i32) { unsafe { ChangeVolumeSoundMem(v, self.h); } }
-  fn stop(&self) { unsafe { StopSoundMem(self.h); } }
-  fn play(&self, t: i32, f: i32) { unsafe { PlaySoundMem(self.h, t, f); } }
-}
-
-impl Drop for Sound {
-  fn drop(&mut self) { self.dispose(); }
-}
-
-impl Sound {
-  pub fn load_mem(n: &String) -> Self {
-    Sound{h: unsafe { LoadSoundMem(n.as_ptr()) } }
-  }
-}
-
-pub struct Tdx {
-  pub tbl: HashMap<i32, Box<dyn Tr>>
-}
-
-impl Tdx {
-  pub fn new() -> Result<Self, Box<dyn Error>> {
-    if unsafe { DxLib_Init() } == -1 { return Err("Cannot init DxLib".into()) }
-    Ok(Tdx{tbl: HashMap::new()})
-  }
-
-  pub fn load_sound_mem(&mut self, n: &String) -> &Box<dyn Tr> { // &Box<Sound>
-    let o = Sound::load_mem(n);
-    let h = o.handle();
-    self.tbl.insert(h, Box::new(o));
-    self.tbl.get(&h).expect("get")
-  }
-
-  pub fn wait_key() -> i32 {
-    unsafe { WaitKey() }
-  }
-
-  pub fn wait_timer(ms: i32) -> i32 {
-    unsafe { WaitTimer(ms) }
-  }
-
-  pub fn set_main_window_text(t: &str) {
-    unsafe { SetMainWindowText(t.as_ptr()); }
-  }
-
-  pub fn set_main_window_text_bytes(t: &[u8]) {
-    unsafe { SetMainWindowText(t.as_ptr()); }
-  }
-
-  pub fn set_graph_mode(w: i32, h: i32, b: i32, fps: i32) {
-    unsafe { SetGraphMode(w, h, b, fps); }
-  }
-
-  pub fn change_window_mode(f: i32) {
-    unsafe { ChangeWindowMode(f); }
-  }
-
-  pub fn set_out_application_log_valid_flag(f: i32) {
-    unsafe { SetOutApplicationLogValidFlag(f); }
-  }
-}
-
-impl Drop for Tdx {
-  fn drop(&mut self) {
-    for (_k, v) in self.tbl.iter_mut() { v.dispose(); }
-    unsafe { DxLib_End(); }
-  }
+impl Tr for Rc<RefCell<Box<(dyn Tr + 'static)>>> {
+  fn handle(&self) -> i32 { self.borrow().handle() }
+  fn dispose(&mut self) { self.borrow_mut().dispose(); }
+  fn volume(&self, v: i32) { self.borrow().volume(v); }
+  fn stop(&self) { self.borrow().stop(); }
+  fn play(&self, t: i32, f: i32) { self.borrow().play(t, f); }
+  fn draw(&self, x: i32, y: i32, f: i32) { self.borrow().draw(x, y, f); }
 }
 
 pub type UV = FLOAT2;

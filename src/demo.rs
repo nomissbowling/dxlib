@@ -1,10 +1,10 @@
 //! demo dx bridge for DxLib
 //!
 
+use crate::{dx::*, ext::*};
+
 pub mod dum;
 pub mod typ;
-
-use crate::{dx::*, ext::*};
 
 pub const TPF_Q: i32 = 2; // triangles per quad
 pub const VPF_Q: usize = 3 * TPF_Q as usize; // vertices per face quad
