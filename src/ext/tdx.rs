@@ -168,8 +168,8 @@ pub fn get_camera_projection_matrix() -> MATRIX {
   unsafe { GetCameraProjectionMatrix() }
 }
 
-pub fn get_projection_matrix() -> MATRIX {
-  unsafe { GetProjectionMatrix() }
+pub fn get_transform_to_projection_matrix(m: &mut MATRIX) -> i32 {
+  unsafe { GetTransformToProjectionMatrix(m as *mut MATRIX) }
 }
 
 pub fn set_transform_to_projection(m: &MATRIX) -> i32 {

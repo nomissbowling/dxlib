@@ -158,7 +158,7 @@ impl MATRIX {
       [0.0, 0.0, 1.0, 0.0],
       [0.0, 0.0, 0.0, 1.0]]}
   }
-  pub fn zeros() -> Self { MATRIX::new() }
+  pub fn identity() -> Self { MATRIX::new() }
 }
 
 #[derive(Debug, Clone)]
@@ -175,7 +175,7 @@ impl MATRIX_D {
       [0.0, 0.0, 1.0, 0.0],
       [0.0, 0.0, 0.0, 1.0]]}
   }
-  pub fn zeros() -> Self { MATRIX_D::new() }
+  pub fn identity() -> Self { MATRIX_D::new() }
 }
 
 // #[no_mangle] // needless
@@ -241,7 +241,7 @@ extern "stdcall" {
   pub fn SetCameraNearFar(near: f32, far: f32) -> i32;
   pub fn SetCameraViewMatrix(vm: MATRIX) -> i32; // MTranspose (GL<->DX)
   pub fn GetCameraProjectionMatrix() -> MATRIX;
-  pub fn GetProjectionMatrix() -> MATRIX;
+  pub fn GetTransformToProjectionMatrix(m: *mut MATRIX) -> i32;
   pub fn SetTransformToProjection(m: *const MATRIX) -> i32;
 
   pub fn CreatePerspectiveFovMatrix(m: *mut MATRIX,

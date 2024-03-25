@@ -106,7 +106,7 @@ unsafe {
     let cam_pos = VECTOR::new(rc * c, rc * s, rs);
     let cam_lookat = VECTOR::new(0.0, 0.0, 0.0);
     let cam_z = VECTOR::new(0.0, 0.0, 1.0); // 0 0 1
-    let mut mv_cam = MATRIX::zeros();
+    let mut mv_cam = MATRIX::identity();
     CreateLookAtMatrix(&mut mv_cam as *mut MATRIX,
       &cam_pos as *const VECTOR,
       &cam_lookat as *const VECTOR,
@@ -114,12 +114,12 @@ unsafe {
     // SetCameraNearFar(0.1, 10000.0);
     SetCameraViewMatrix(mv_cam); // MTranspose (GL<->DX)
     let mp_cam = GetCameraProjectionMatrix();
-    // let mut mp; // = GetProjectionMatrix();
     SetTransformToProjection(&mp_cam as *const MATRIX);
-    // let mut mp = MATRIX::zeros();
+    // let mut mp = MATRIX::identity();
+    // GetTransformToProjectionMatrix(&mut mp as *mut MATRIX);
     // CreatePerspectiveFovMatrix(&mut mp as *mut MATRIX, fov, zn, zf, aspect);
     // SetTransformToProjection(&mp as *const MATRIX);
-    // let mut mv = MATRIX::zeros();
+    // let mut mv = MATRIX::identity();
     // CreateViewportMatrix(&mut mv as *mut MATRIX, cx, cy, w, h);
     // SetTransformToViewport(&mv as *const MATRIX);
 

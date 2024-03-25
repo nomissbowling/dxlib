@@ -107,17 +107,17 @@ pub fn screen(p: &str) -> Result<(), Box<dyn Error>> {
     let cam_pos = VECTOR::new(rc * c, rc * s, rs);
     let cam_lookat = VECTOR::new(0.0, 0.0, 0.0);
     let cam_z = VECTOR::new(0.0, 0.0, 1.0); // 0 0 1
-    let mut mv_cam = MATRIX::zeros();
+    let mut mv_cam = MATRIX::identity();
     create_look_at_matrix(&mut mv_cam, &cam_pos, &cam_lookat, &cam_z);
     // set_camera_near_far(0.1, 10000.0);
     set_camera_view_matrix(mv_cam); // MTranspose (GL<->DX)
     let mp_cam = get_camera_projection_matrix();
-    // let mut mp; // = get_projection_matrix();
     set_transform_to_projection(&mp_cam);
-    // let mut mp = MATRIX::zeros();
+    // let mut mp = MATRIX::identity();
+    // get_transform_to_projection_matrix(&mut mp);
     // create_perspective_fov_matrix(&mut mp, fov, zn, zf, aspect);
     // set_transform_to_projection(&mp);
-    // let mut mv = MATRIX::zeros();
+    // let mut mv = MATRIX::identity();
     // create_viewport_matrix(&mut mv, cx, cy, w, h);
     // set_transform_to_viewport(&mv);
 
