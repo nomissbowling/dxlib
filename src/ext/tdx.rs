@@ -42,6 +42,16 @@ impl Tdx {
     self.reg(Box::new(Graph::load(n)))
   }
 
+  pub fn load_div_graph(&mut self, n: &String, allnum: i32,
+    xnum: i32, ynum: i32, xsz: i32, ysz: i32,
+    not_use_3d_flag: i32, xstride: i32, ystride: i32) -> Vec<RcTr> {
+    let mut handle_buf = vec![0i32; allnum as usize];
+    unsafe { LoadDivGraph(n.as_ptr(), allnum,
+      xnum, ynum, xsz, ysz, &mut handle_buf[0] as *mut i32,
+      not_use_3d_flag, xstride, ystride); }
+    handle_buf.into_iter().map(|h| self.reg(Box::new(Graph{h}))).collect()
+  }
+
   pub fn load_vertex_shader(&mut self, n: &String) -> RcTr {
     self.reg(Box::new(VertexShader::load(n)))
   }

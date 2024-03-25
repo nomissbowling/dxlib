@@ -27,7 +27,8 @@ pub fn screen(p: &str) -> Result<(), Box<dyn Error>> {
     "shader_VS.vso\0",
     "shader_PS.pso\0",
     "shader_GS.gso\0",
-    "_font_32_u8_0000.dft\0" // pre convert by CreateDXFontData.exe
+    "_font_32_u8_0000.dft\0", // pre convert by CreateDXFontData.exe
+    "_img_256x256_16x64x64.png\0" // 12 scenes
   ].into_iter().map(|p|
     base.join(p).to_str().expect("str").to_string()).collect();
 
@@ -58,6 +59,8 @@ pub fn screen(p: &str) -> Result<(), Box<dyn Error>> {
   let fsys = dx.create_font("Arial\0", 32, 1, -1, -1, -1, TRUE); // italic
   let fdat = dx.load_font(&res[9]);
   println!("fsys: {:08x} fdat: {:08x}", fsys.handle(), fdat.handle());
+  let ani = dx.load_div_graph(&res[10], 12, 4, 3, 64, 64, FALSE, 0, 0);
+  // for a in ani.iter() { println!("ani: {:08x}", a.handle()); }
 
   select_midi_mode(DX_MIDIMODE_MCI);
   bgm.volume(96);
@@ -84,14 +87,16 @@ pub fn screen(p: &str) -> Result<(), Box<dyn Error>> {
     if process_message() != 0 { break; }
     clear_draw_screen(NULL);
     // loss time test draw many pixel
-    for r in 0..240 {
-      for c in 0..320 {
-        draw_pixel(160 + c, 120 + r, get_color(255 - c / 2, 192 - r / 2, 32));
+    for r in 0..360 {
+      for c in 0..480 {
+        draw_pixel(80 + c, 60 + r, get_color(255 - c / 2, 192 - r / 2, 32));
       }
     }
     let i = tick * 640 / (n * m);
     let anim = (tick >> 6 & 1) as usize;
     [&grp, &tex][anim].draw(i * 4 / 8, i * 3 / 8, TRUE); // transparent
+    let anim = (tick >> 3) as usize % (2 * ani.len());
+    ani[anim % ani.len()].draw(80, 420 - 64 - 13 * anim as i32, TRUE);
 
     set_draw_screen(DX_SCREEN_WORK);
     set_use_back_culling(TRUE); // small true is not same as 1 or TRUE

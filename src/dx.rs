@@ -218,6 +218,9 @@ extern "stdcall" {
   pub fn StopSoundMem(sh: i32) -> i32;
   pub fn ChangeVolumeSoundMem(volumepal: i32, sh: i32) -> i32;
 
+  pub fn LoadDivGraph(fname: *const u8, allnum: i32,
+    xnum: i32, ynum: i32, xsz: i32, ysz: i32, handle_buf: *mut i32,
+    not_use_3d_flag: i32, xstride: i32, ystride: i32) -> i32;
   pub fn LoadGraph(fname: *const u8) -> i32;
   pub fn DeleteGraph(gh: i32, logout: i32) -> i32;
   pub fn DrawGraph(x: i32, y: i32, gh: i32, trans: i32) -> i32;
