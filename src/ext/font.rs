@@ -15,13 +15,11 @@ impl Tr for Font {
       self.h = 0;
     }
   }
-  /// use "%%" as "%"
-  fn draw_string(&self, x: i32, y: i32, c: u32, s: &String) {
-    unsafe { DrawFormatStringToHandle(x, y, c, self.h, s.as_ptr()); }
+  fn draw_string(&self, x: i32, y: i32, s: &String, c: u32, e: u32, v: i32) {
+    unsafe { DrawStringToHandle(x, y, s.as_ptr(), c, self.h, e, v); }
   }
-  /// use "%%" as "%"
-  fn draw_bytes(&self, x: i32, y: i32, c: u32, b: &[u8]) {
-    unsafe { DrawFormatStringToHandle(x, y, c, self.h, b.as_ptr()); }
+  fn draw_bytes(&self, x: i32, y: i32, b: &[u8], c: u32, e: u32, v: i32) {
+    unsafe { DrawStringToHandle(x, y, b.as_ptr(), c, self.h, e, v); }
   }
 }
 

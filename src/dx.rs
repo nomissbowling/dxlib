@@ -257,6 +257,8 @@ extern "stdcall" {
   pub fn CreateFontToHandle(font: *const u8, sz: i32, thick: i32,
     fonttype: i32, charset: i32, edgesz: i32, italic: i32, handle: i32) -> i32;
   pub fn LoadFontDataToHandle(fname: *const u8, edgesz: i32) -> i32;
+  pub fn DrawStringToHandle(x: i32, y: i32, s: *const u8,
+    color: u32, fh: i32, edgecolor: u32, vertical_flag: i32) -> i32;
   pub fn DrawFormatStringToHandle(x: i32, y: i32, color: u32, fh: i32,
     fmt: *const u8) -> i32;
 

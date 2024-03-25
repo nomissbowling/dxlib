@@ -15,7 +15,7 @@ use crate::ext::shader::{VertexShader, PixelShader, GeometryShader};
 use crate::ext::font::Font;
 
 pub struct Tdx {
-  pub tbl: HashMap<i32, Rc<RefCell<Box<dyn Tr>>>>
+  pub tbl: HashMap<i32, RcTr>
 }
 
 impl Tdx {
@@ -24,47 +24,44 @@ impl Tdx {
     Ok(Tdx{tbl: HashMap::new()})
   }
 
-  pub fn reg(&mut self, o: impl Tr + 'static) -> Rc<RefCell<Box<dyn Tr>>> {
+  pub fn reg(&mut self, o: Box<dyn Tr>) -> RcTr {
     let h = o.handle();
-    self.tbl.insert(h, Rc::new(RefCell::new(Box::new(o))));
+    self.tbl.insert(h, Rc::new(RefCell::new(o)));
     self.tbl.get(&h).expect("get").clone()
   }
 
-  pub fn load_music_mem(&mut self, n: &String) -> Rc<RefCell<Box<dyn Tr>>> {
-    self.reg(Music::load_mem(n))
+  pub fn load_music_mem(&mut self, n: &String) -> RcTr {
+    self.reg(Box::new(Music::load_mem(n)))
   }
 
-  pub fn load_sound_mem(&mut self, n: &String) -> Rc<RefCell<Box<dyn Tr>>> {
-    self.reg(Sound::load_mem(n))
+  pub fn load_sound_mem(&mut self, n: &String) -> RcTr {
+    self.reg(Box::new(Sound::load_mem(n)))
   }
 
-  pub fn load_graph(&mut self, n: &String) -> Rc<RefCell<Box<dyn Tr>>> {
-    self.reg(Graph::load(n))
+  pub fn load_graph(&mut self, n: &String) -> RcTr {
+    self.reg(Box::new(Graph::load(n)))
   }
 
-  pub fn load_vertex_shader(&mut self, n: &String) ->
-    Rc<RefCell<Box<dyn Tr>>> {
-    self.reg(VertexShader::load(n))
+  pub fn load_vertex_shader(&mut self, n: &String) -> RcTr {
+    self.reg(Box::new(VertexShader::load(n)))
   }
 
-  pub fn load_pixel_shader(&mut self, n: &String) ->
-    Rc<RefCell<Box<dyn Tr>>> {
-    self.reg(PixelShader::load(n))
+  pub fn load_pixel_shader(&mut self, n: &String) -> RcTr {
+    self.reg(Box::new(PixelShader::load(n)))
   }
 
-  pub fn load_geometry_shader(&mut self, n: &String) ->
-    Rc<RefCell<Box<dyn Tr>>> {
-    self.reg(GeometryShader::load(n))
+  pub fn load_geometry_shader(&mut self, n: &String) -> RcTr {
+    self.reg(Box::new(GeometryShader::load(n)))
   }
 
   pub fn create_font(&mut self, n: &str, sz: i32, thick: i32,
-    fonttype: i32, charset: i32, edgesz: i32, italic: i32) ->
-    Rc<RefCell<Box<dyn Tr>>> {
-    self.reg(Font::create(n, sz, thick, fonttype, charset, edgesz, italic))
+    fonttype: i32, charset: i32, edgesz: i32, italic: i32) -> RcTr {
+    self.reg(
+      Box::new(Font::create(n, sz, thick, fonttype, charset, edgesz, italic)))
   }
 
-  pub fn load_font(&mut self, n: &String) -> Rc<RefCell<Box<dyn Tr>>> {
-    self.reg(Font::load_data(n))
+  pub fn load_font(&mut self, n: &String) -> RcTr {
+    self.reg(Box::new(Font::load_data(n)))
   }
 }
 

@@ -67,8 +67,10 @@ pub fn screen(p: &str) -> Result<(), Box<dyn Error>> {
 
   set_draw_screen(DX_SCREEN_WORK);
   clear_draw_screen(NULL);
-  fsys.draw_string(40, 400, get_color(255, 192, 32), &format!("waiting...\0"));
-  fdat.draw_string(40, 440, get_color(32, 192, 255), &format!("waiting...\0"));
+  fsys.draw_string(40, 400, &format!("waiting...\0"),
+    get_color(255, 192, 32), get_color(255, 0, 0), FALSE);
+  fdat.draw_string(40, 440, &format!("waiting...\0"),
+    get_color(32, 192, 255), get_color(0, 0, 255), FALSE);
   screen_flip();
   wait_key();
 
