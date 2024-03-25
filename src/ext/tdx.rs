@@ -206,3 +206,11 @@ pub fn get_color(r: i32, g: i32, b: i32) -> u32 {
 pub fn draw_pixel(x: i32, y: i32, c: u32) -> i32 {
   unsafe { DrawPixel(x, y, c) }
 }
+
+pub fn set_window_style_mode(s: i32) -> i32 {
+  unsafe { SetWindowStyleMode(s) }
+}
+
+pub fn set_use_back_buffer_trans_color_flag(f: i32) -> i32 {
+  unsafe { SetUseBackBufferTransColorFlag(f) }
+}

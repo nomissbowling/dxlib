@@ -34,6 +34,8 @@ pub fn screen(p: &str) -> Result<(), Box<dyn Error>> {
   set_out_application_log_valid_flag(FALSE);
   change_window_mode(TRUE); // not full screen
   set_graph_mode(640, 480, 32, 60); // 32 bit 60 fps
+  // set_window_style_mode(2); // no frame
+  // set_use_back_buffer_trans_color_flag(TRUE); // transparent
   let u8t: &[u8] = &[0x83, 0x65, 0x83, 0x58, 0x83, 0x67, 0x00]; // in cp932
   set_main_window_text_bytes(u8t);
 
@@ -76,8 +78,9 @@ pub fn screen(p: &str) -> Result<(), Box<dyn Error>> {
 
   set_draw_screen(DX_SCREEN_BACK);
   let m_pi = std::f32::consts::PI;
-  let mut tick = 0i32;
-  for i in 0..640 {
+  let n = 360i32;
+  let m = 4;
+  for tick in 0..n * m {
     if process_message() != 0 { break; }
     clear_draw_screen(NULL);
     // loss time test draw many pixel
@@ -86,7 +89,9 @@ pub fn screen(p: &str) -> Result<(), Box<dyn Error>> {
         draw_pixel(160 + c, 120 + r, get_color(255 - c / 2, 192 - r / 2, 32));
       }
     }
-    grp.draw(i * 4 / 8, i * 3 / 8, TRUE); // transparent
+    let i = tick * 640 / (n * m);
+    let anim = (tick >> 6 & 1) as usize;
+    [&grp, &tex][anim].draw(i * 4 / 8, i * 3 / 8, TRUE); // transparent
 
     set_draw_screen(DX_SCREEN_WORK);
     set_use_back_culling(TRUE); // small true is not same as 1 or TRUE
@@ -96,12 +101,11 @@ pub fn screen(p: &str) -> Result<(), Box<dyn Error>> {
     // shg.set_shader();
 
     // after set_draw_screen
-    tick += 1;
     let r = 512.0f32;
     let t = tick as f32 * m_pi / 180.0;
     let c = t.cos();
     let s = t.sin();
-    let p = ((tick % 91) - 45) as f32 * m_pi / 180.0;
+    let p = (((tick / 4) % 91) - 45) as f32 * m_pi / 180.0;
     let rc = r * p.cos();
     let rs = r * p.sin();
     let cam_pos = VECTOR::new(rc * c, rc * s, rs);

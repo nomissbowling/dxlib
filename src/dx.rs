@@ -264,6 +264,10 @@ extern "stdcall" {
 
   pub fn GetColor(r: i32, g: i32, b: i32) -> u32;
   pub fn DrawPixel(x: i32, y: i32, c: u32) -> i32;
+
+  /// private
+  pub fn SetWindowStyleMode(s: i32) -> i32;
+  pub fn SetUseBackBufferTransColorFlag(f: i32) -> i32;
 }
 
 pub const NULL: *const c_void = 0 as *const c_void;
