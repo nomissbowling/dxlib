@@ -14,6 +14,40 @@ use crate::ext::graph::Graph;
 use crate::ext::shader::{VertexShader, PixelShader, GeometryShader};
 use crate::ext::font::Font;
 
+pub type RcTr = Rc<RefCell<Box<dyn Tr>>>;
+
+pub trait Tr {
+  fn as_music(&self) -> Option<Music> { None }
+  fn as_sound(&self) -> Option<Sound> { None }
+  fn as_graph(&self) -> Option<Graph> { None }
+  fn as_vertex_shader(&self) -> Option<VertexShader> { None }
+  fn as_pixel_shader(&self) -> Option<PixelShader> { None }
+  fn as_geometry_shader(&self) -> Option<GeometryShader> { None }
+  fn as_font(&self) -> Option<Font> { None }
+
+  fn handle(&self) -> i32;
+  fn dispose(&mut self);
+}
+
+impl Tr for RcTr {
+  fn as_music(&self) -> Option<Music> { self.borrow().as_music() }
+  fn as_sound(&self) -> Option<Sound> { self.borrow().as_sound() }
+  fn as_graph(&self) -> Option<Graph> { self.borrow().as_graph() }
+  fn as_vertex_shader(&self) -> Option<VertexShader> {
+    self.borrow().as_vertex_shader()
+  }
+  fn as_pixel_shader(&self) -> Option<PixelShader> {
+    self.borrow().as_pixel_shader()
+  }
+  fn as_geometry_shader(&self) -> Option<GeometryShader> {
+    self.borrow().as_geometry_shader()
+  }
+  fn as_font(&self) -> Option<Font> { self.borrow().as_font() }
+
+  fn handle(&self) -> i32 { self.borrow().handle() }
+  fn dispose(&mut self) { self.borrow_mut().dispose(); }
+}
+
 pub struct Tdx {
   pub tbl: HashMap<i32, RcTr>
 }
@@ -30,53 +64,64 @@ impl Tdx {
     self.tbl.get(&h).expect("get").clone()
   }
 
-  pub fn load_music_mem(&mut self, n: &String) -> RcTr {
+  pub fn load_music_mem(&mut self, n: &String) -> Music {
     self.reg(Box::new(Music::load_mem(n)))
+    .as_music().expect("music")
   }
 
-  pub fn load_sound_mem(&mut self, n: &String) -> RcTr {
+  pub fn load_sound_mem(&mut self, n: &String) -> Sound {
     self.reg(Box::new(Sound::load_mem(n)))
+    .as_sound().expect("sound")
   }
 
   pub fn make_graph(&mut self, xsz: i32, ysz: i32,
-    not_use_3d_flag: i32) -> RcTr {
+    not_use_3d_flag: i32) -> Graph {
     self.reg(Box::new(Graph::make(xsz, ysz, not_use_3d_flag)))
+    .as_graph().expect("graph")
   }
 
-  pub fn load_graph(&mut self, n: &String) -> RcTr {
+  pub fn load_graph(&mut self, n: &String) -> Graph {
     self.reg(Box::new(Graph::load(n)))
+    .as_graph().expect("graph")
   }
 
   pub fn load_div_graph(&mut self, n: &String, allnum: i32,
     xnum: i32, ynum: i32, xsz: i32, ysz: i32,
-    not_use_3d_flag: i32, xstride: i32, ystride: i32) -> Vec<RcTr> {
+    not_use_3d_flag: i32, xstride: i32, ystride: i32) -> Vec<Graph> {
     let mut handle_buf = vec![0i32; allnum as usize];
     unsafe { LoadDivGraph(n.as_ptr(), allnum,
       xnum, ynum, xsz, ysz, &mut handle_buf[0] as *mut i32,
       not_use_3d_flag, xstride, ystride); }
-    handle_buf.into_iter().map(|h| self.reg(Box::new(Graph{h}))).collect()
+    handle_buf.into_iter().map(|h|
+      self.reg(Box::new(Graph{d: true, h}))
+      .as_graph().expect("graph")).collect()
   }
 
-  pub fn load_vertex_shader(&mut self, n: &String) -> RcTr {
+  pub fn load_vertex_shader(&mut self, n: &String) -> VertexShader {
     self.reg(Box::new(VertexShader::load(n)))
+    .as_vertex_shader().expect("vertex shader")
   }
 
-  pub fn load_pixel_shader(&mut self, n: &String) -> RcTr {
+  pub fn load_pixel_shader(&mut self, n: &String) -> PixelShader {
     self.reg(Box::new(PixelShader::load(n)))
+    .as_pixel_shader().expect("pixel shader")
   }
 
-  pub fn load_geometry_shader(&mut self, n: &String) -> RcTr {
+  pub fn load_geometry_shader(&mut self, n: &String) -> GeometryShader {
     self.reg(Box::new(GeometryShader::load(n)))
+    .as_geometry_shader().expect("geometry shader")
   }
 
   pub fn create_font(&mut self, n: &str, sz: i32, thick: i32,
-    fonttype: i32, charset: i32, edgesz: i32, italic: i32) -> RcTr {
+    fonttype: i32, charset: i32, edgesz: i32, italic: i32) -> Font {
     self.reg(
       Box::new(Font::create(n, sz, thick, fonttype, charset, edgesz, italic)))
+    .as_font().expect("font")
   }
 
-  pub fn load_font(&mut self, n: &String) -> RcTr {
+  pub fn load_font(&mut self, n: &String) -> Font {
     self.reg(Box::new(Font::load_data(n)))
+    .as_font().expect("font")
   }
 }
 

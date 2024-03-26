@@ -65,7 +65,7 @@ pub fn screen(p: &str) -> Result<(), Box<dyn Error>> {
 
   select_midi_mode(DX_MIDIMODE_MCI);
   bgm.volume(96);
-  bgm.play(DX_PLAYTYPE_BACK, TRUE);
+  bgm.play(DX_PLAYTYPE_BACK);
 
   set_main_window_text("loop sound\0");
   lps.volume(96);

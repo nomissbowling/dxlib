@@ -1,9 +1,6 @@
 //! ext dx bridge for DxLib
 //!
 
-use std::rc::Rc;
-use std::cell::RefCell;
-
 use crate::dx::*;
 
 pub mod music;
@@ -12,52 +9,6 @@ pub mod graph;
 pub mod shader;
 pub mod font;
 pub mod tdx;
-
-pub type RcTr = Rc<RefCell<Box<dyn Tr>>>;
-
-pub trait Tr {
-  fn handle(&self) -> i32;
-  fn dispose(&mut self);
-  fn volume(&self, _v: i32) {} // default do nothing
-  fn stop(&self) {} // default do nothing
-  fn play(&self, _t: i32, _f: i32) {} // default do nothing
-  fn get_draw_screen(&self, _l: i32, _t: i32, _r: i32, _b: i32,
-    _use_client_flag: i32) {}
-  fn draw(&self, _x: i32, _y: i32, _f: i32) {} // default do nothing
-  fn draw_rota(&self, _x: i32, _y: i32, _extrate: f64, _angle: f64,
-    _trans: i32, _reversex: i32, _reversey: i32) {} // default do nothing
-  fn set_to_shader(&self, _i: i32) {}
-  fn set_shader(&self) {}
-  fn draw_string(&self, _x: i32, _y: i32,
-    _s: &String, _c: u32, _e: u32, _v: i32) {}
-  fn draw_bytes(&self, _x: i32, _y: i32,
-    _b: &[u8], _c: u32, _e: u32, _v: i32) {}
-}
-
-impl Tr for RcTr {
-  fn handle(&self) -> i32 { self.borrow().handle() }
-  fn dispose(&mut self) { self.borrow_mut().dispose(); }
-  fn volume(&self, v: i32) { self.borrow().volume(v); }
-  fn stop(&self) { self.borrow().stop(); }
-  fn play(&self, t: i32, f: i32) { self.borrow().play(t, f); }
-  fn get_draw_screen(&self, l: i32, t: i32, r: i32, b: i32,
-    use_client_flag: i32) {
-    self.borrow().get_draw_screen(l, t, r, b, use_client_flag);
-  }
-  fn draw(&self, x: i32, y: i32, f: i32) { self.borrow().draw(x, y, f); }
-  fn draw_rota(&self, x: i32, y: i32, extrate: f64, angle: f64,
-    trans: i32, reversex: i32, reversey: i32) {
-    self.borrow().draw_rota(x, y, extrate, angle, trans, reversex, reversey);
-  }
-  fn set_to_shader(&self, i: i32) { self.borrow().set_to_shader(i); }
-  fn set_shader(&self) { self.borrow().set_shader(); }
-  fn draw_string(&self, x: i32, y: i32, s: &String, c: u32, e: u32, v: i32) {
-    self.borrow().draw_string(x, y, s, c, e, v);
-  }
-  fn draw_bytes(&self, x: i32, y: i32, b: &[u8], c: u32, e: u32, v: i32) {
-    self.borrow().draw_bytes(x, y, b, c, e, v);
-  }
-}
 
 pub type UV = FLOAT2;
 pub type POS = FLOAT4;
