@@ -61,6 +61,7 @@ pub fn screen(p: &str) -> Result<(), Box<dyn Error>> {
   println!("fsys: {:08x} fdat: {:08x}", fsys.handle(), fdat.handle());
   let ani = dx.load_div_graph(&res[10], 12, 4, 3, 64, 64, FALSE, 0, 0);
   // for a in ani.iter() { println!("ani: {:08x}", a.handle()); }
+  let gds = dx.make_graph(64, 64, FALSE); // empty for clipping
 
   select_midi_mode(DX_MIDIMODE_MCI);
   bgm.volume(96);
@@ -86,6 +87,7 @@ pub fn screen(p: &str) -> Result<(), Box<dyn Error>> {
   for tick in 0..n * m {
     if process_message() != 0 { break; }
     clear_draw_screen(NULL);
+    set_draw_blend_mode(DX_BLENDMODE_NOBLEND, 0);
     // loss time test draw many pixel
     for r in 0..360 {
       for c in 0..480 {
@@ -93,14 +95,20 @@ pub fn screen(p: &str) -> Result<(), Box<dyn Error>> {
       }
     }
     let i = tick * 640 / (n * m);
-    let anim = (tick >> 6 & 1) as usize;
-    [&grp, &tex][anim].draw(i * 4 / 8, i * 3 / 8, TRUE); // transparent
+    let anim = (tick >> 6) as usize;
+    [&grp, &tex][anim % 2].draw(i * 4 / 8, i * 3 / 8, TRUE); // transparent
     let anim = (tick >> 3) as usize % (2 * ani.len());
-    ani[anim % ani.len()].draw(80, 420 - 64 - 13 * anim as i32, TRUE);
+    let left = 80;
+    let top = 420 - 64 - 13 * anim as i32;
+    ani[anim % ani.len()].draw(left, top, TRUE);
+    gds.get_draw_screen(left, top, left + 64, top + 64, TRUE); // clipping
 
     set_draw_screen(DX_SCREEN_WORK);
     set_use_back_culling(TRUE); // small true is not same as 1 or TRUE
-    tex.set_to_shader(0);
+    // tex.set_to_shader(0); // single texture
+    // [&grp, &tex][anim % 2].set_to_shader(0); // changing texture
+    // ani[anim % ani.len()].set_to_shader(0); // transparent (black on black)
+    gds.set_to_shader(0); // clipped rect of 2d screen
     shv.set_shader();
     shp.set_shader();
     // shg.set_shader();

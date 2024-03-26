@@ -191,6 +191,7 @@ extern "stdcall" {
     ColorBitDepth: i32, RefreshRate: i32) -> i32;
   pub fn SetOutApplicationLogValidFlag(b: i32) -> i32;
   pub fn SetMainWindowText(WindowText: *const u8) -> i32;
+
   pub fn SetDrawBlendMode(bm: i32, pal: i32) -> i32;
 
   pub fn GetJoypadInputState(inputtype: i32) -> i32;
@@ -218,6 +219,9 @@ extern "stdcall" {
   pub fn StopSoundMem(sh: i32) -> i32;
   pub fn ChangeVolumeSoundMem(volumepal: i32, sh: i32) -> i32;
 
+  pub fn GetDrawScreenGraph(l: i32, t: i32, r: i32, b: i32,
+    gh: i32, use_client_flag: i32) -> i32;
+  pub fn MakeGraph(xsz: i32, ysz: i32, not_use_3d_flag: i32) -> i32;
   pub fn LoadDivGraph(fname: *const u8, allnum: i32,
     xnum: i32, ynum: i32, xsz: i32, ysz: i32, handle_buf: *mut i32,
     not_use_3d_flag: i32, xstride: i32, ystride: i32) -> i32;
@@ -269,8 +273,10 @@ extern "stdcall" {
   pub fn DrawPixel(x: i32, y: i32, c: u32) -> i32;
 
   /// private
+  /// - [https://densanken.com/wiki/index.php?dx%A5%E9%A5%A4%A5%D6%A5%E9%A5%EA%B1%A3%A4%B7%B4%D8%BF%F4%A4%CE%A5%DA%A1%BC%A5%B8](https://densanken.com/wiki/index.php?dx%A5%E9%A5%A4%A5%D6%A5%E9%A5%EA%B1%A3%A4%B7%B4%D8%BF%F4%A4%CE%A5%DA%A1%BC%A5%B8)
   pub fn SetWindowStyleMode(s: i32) -> i32;
   pub fn SetUseBackBufferTransColorFlag(f: i32) -> i32;
+  pub fn SetUseDirect3DVersion(v: i32) -> i32;
 }
 
 pub const NULL: *const c_void = 0 as *const c_void;
@@ -281,6 +287,25 @@ pub const DX_SCREEN_BACK: i32 = -2;
 pub const DX_SCREEN_WORK: i32 = -3;
 pub const DX_SCREEN_FRONT: i32 = -4;
 
+pub const DX_BLENDMODE_NOBLEND: i32 = 0;
+pub const DX_BLENDMODE_ALPHA: i32 = 1;
+pub const DX_BLENDMODE_ADD: i32 = 2;
+pub const DX_BLENDMODE_SUB: i32 = 3;
+pub const DX_BLENDMODE_MUL: i32 = 4;
+pub const DX_BLENDMODE_XOR: i32 = 6;
+pub const DX_BLENDMODE_DESTCOLOR: i32 = 8;
+pub const DX_BLENDMODE_INVDESTCOLOR: i32 = 9;
+pub const DX_BLENDMODE_INVSRC: i32 = 10;
+pub const DX_BLENDMODE_MULA: i32 = 11;
+pub const DX_BLENDMODE_SRCCOLOR: i32 = 14;
+pub const DX_BLENDMODE_PMA_ALPHA: i32 = 17;
+pub const DX_BLENDMODE_PMA_ADD: i32 = 18;
+pub const DX_BLENDMODE_PMA_SUB: i32 = 19;
+pub const DX_BLENDMODE_PMA_INVSRC: i32 = 20;
+pub const DX_BLENDMODE_CUSTOM: i32 = 32;
+/// more blend modes
+pub const DX_BLENDMODE_NUM: i32 = 33;
+
 pub const DX_MIDIMODE_MCI: i32 = 0;
 
 pub const DX_PLAYTYPE_LOOPBIT: i32 = 2;
@@ -288,3 +313,16 @@ pub const DX_PLAYTYPE_BACKBIT: i32 = 1;
 pub const DX_PLAYTYPE_NORMAL: i32 = 0;
 pub const DX_PLAYTYPE_BACK: i32 = DX_PLAYTYPE_BACKBIT;
 pub const DX_PLAYTYPE_LOOP: i32 = DX_PLAYTYPE_LOOPBIT | DX_PLAYTYPE_BACKBIT;
+
+pub const DX_DIRECT3D_NONE: i32 = 0;
+pub const DX_DIRECT3D_9: i32 = 1;
+pub const DX_DIRECT3D_9EX: i32 = 2;
+pub const DX_DIRECT3D_11: i32 = 3;
+
+pub const DX_DIRECT3D_11_FEATURE_LEVEL_9_1: i32 = 0x9100;
+pub const DX_DIRECT3D_11_FEATURE_LEVEL_9_2: i32 = 0x9200;
+pub const DX_DIRECT3D_11_FEATURE_LEVEL_9_3: i32 = 0x9300;
+pub const DX_DIRECT3D_11_FEATURE_LEVEL_10_0: i32 = 0xa000;
+pub const DX_DIRECT3D_11_FEATURE_LEVEL_10_1: i32 = 0xa100;
+pub const DX_DIRECT3D_11_FEATURE_LEVEL_11_0: i32 = 0xb000;
+pub const DX_DIRECT3D_11_FEATURE_LEVEL_11_1: i32 = 0xb100;

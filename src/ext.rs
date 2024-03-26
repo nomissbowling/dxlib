@@ -21,6 +21,8 @@ pub trait Tr {
   fn volume(&self, _v: i32) {} // default do nothing
   fn stop(&self) {} // default do nothing
   fn play(&self, _t: i32, _f: i32) {} // default do nothing
+  fn get_draw_screen(&self, _l: i32, _t: i32, _r: i32, _b: i32,
+    _use_client_flag: i32) {}
   fn draw(&self, _x: i32, _y: i32, _f: i32) {} // default do nothing
   fn draw_rota(&self, _x: i32, _y: i32, _extrate: f64, _angle: f64,
     _trans: i32, _reversex: i32, _reversey: i32) {} // default do nothing
@@ -38,6 +40,10 @@ impl Tr for RcTr {
   fn volume(&self, v: i32) { self.borrow().volume(v); }
   fn stop(&self) { self.borrow().stop(); }
   fn play(&self, t: i32, f: i32) { self.borrow().play(t, f); }
+  fn get_draw_screen(&self, l: i32, t: i32, r: i32, b: i32,
+    use_client_flag: i32) {
+    self.borrow().get_draw_screen(l, t, r, b, use_client_flag);
+  }
   fn draw(&self, x: i32, y: i32, f: i32) { self.borrow().draw(x, y, f); }
   fn draw_rota(&self, x: i32, y: i32, extrate: f64, angle: f64,
     trans: i32, reversex: i32, reversey: i32) {

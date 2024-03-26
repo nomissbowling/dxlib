@@ -38,6 +38,11 @@ impl Tdx {
     self.reg(Box::new(Sound::load_mem(n)))
   }
 
+  pub fn make_graph(&mut self, xsz: i32, ysz: i32,
+    not_use_3d_flag: i32) -> RcTr {
+    self.reg(Box::new(Graph::make(xsz, ysz, not_use_3d_flag)))
+  }
+
   pub fn load_graph(&mut self, n: &String) -> RcTr {
     self.reg(Box::new(Graph::load(n)))
   }
@@ -102,6 +107,7 @@ pub fn set_main_window_text_bytes(t: &[u8]) -> i32 {
   unsafe { SetMainWindowText(t.as_ptr()) }
 }
 
+/// DX_BLENDMODE_NOBLEND DX_BLENDMODE_ALPHA DX_BLENDMODE_INVSRC etc
 pub fn set_draw_blend_mode(bm: i32, pal: i32) -> i32 {
   unsafe { SetDrawBlendMode(bm, pal) }
 }
@@ -223,4 +229,8 @@ pub fn set_window_style_mode(s: i32) -> i32 {
 
 pub fn set_use_back_buffer_trans_color_flag(f: i32) -> i32 {
   unsafe { SetUseBackBufferTransColorFlag(f) }
+}
+
+pub fn set_use_direct_3d_version(v: i32) -> i32 {
+  unsafe { SetUseDirect3DVersion(v) }
 }
