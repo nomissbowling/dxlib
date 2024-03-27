@@ -228,8 +228,17 @@ extern "stdcall" {
   pub fn LoadGraph(fname: *const u8) -> i32;
   pub fn DeleteGraph(gh: i32, logout: i32) -> i32;
   pub fn DrawGraph(x: i32, y: i32, gh: i32, trans: i32) -> i32;
+  pub fn DrawTurnGraph(x: i32, y: i32, gh: i32, trans: i32) -> i32;
+  pub fn DrawExtendGraph(l: i32, t: i32, r: i32, b: i32,
+    gh: i32, trans: i32) -> i32;
   pub fn DrawRotaGraph(x: i32, y: i32, extrate: f64, angle: f64,
     gh: i32, trans: i32, reversex: i32, reversey: i32) -> i32;
+  pub fn DrawModiGraph(xlt: i32, ylt: i32, xrt: i32, yrt: i32,
+    xrb: i32, yrb: i32, xlb: i32, ylb: i32, gh: i32, trans: i32) -> i32;
+  pub fn DrawRectGraph(x: i32, y: i32, srcx: i32, srcy: i32, w: i32, h: i32,
+    gh: i32, trans: i32, reversex: i32, reversey: i32) -> i32;
+  pub fn DrawRectExtendGraph(l: i32, t: i32, r: i32, b: i32,
+    srcx: i32, srcy: i32, w: i32, h: i32, gh: i32, trans: i32) -> i32;
 
   pub fn InitShader() -> i32;
   pub fn LoadVertexShader(vso: *const u8) -> i32;

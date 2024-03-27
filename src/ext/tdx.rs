@@ -58,6 +58,13 @@ impl Tdx {
     Ok(Tdx{tbl: HashMap::new()})
   }
 
+  pub fn unreg(&mut self, o: Box<dyn Tr>) {
+    match self.tbl.remove(&o.handle()) {
+    None => (), // or expect("unreg dup")
+    Some(mut v) => v.dispose()
+    }
+  }
+
   pub fn reg(&mut self, o: Box<dyn Tr>) -> RcTr {
     let h = o.handle();
     self.tbl.insert(h, Rc::new(RefCell::new(o)));

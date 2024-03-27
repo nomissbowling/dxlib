@@ -52,14 +52,43 @@ impl Graph {
     unsafe { GetDrawScreenGraph(l, t, r, b, self.h, use_client_flag); }
   }
   /// draw to screen
-  pub fn draw(&self, x: i32, y: i32, f: i32) {
-    unsafe { DrawGraph(x, y, self.h, f); }
+  pub fn draw(&self, x: i32, y: i32, trans: i32) {
+    unsafe { DrawGraph(x, y, self.h, trans); }
+  }
+  /// draw turn LR
+  pub fn draw_turn(&self, x: i32, y: i32, trans: i32) {
+    unsafe { DrawTurnGraph(x, y, self.h, trans); }
+  }
+  /// draw extend
+  pub fn draw_extend(&self, l: i32, t: i32, r: i32, b: i32, trans: i32) {
+    unsafe { DrawExtendGraph(l, t, r, b, self.h, trans); }
   }
   /// draw rotate
   pub fn draw_rota(&self, x: i32, y: i32, extrate: f64, angle: f64,
     trans: i32, reversex: i32, reversey: i32) {
     unsafe {
       DrawRotaGraph(x, y, extrate, angle, self.h, trans, reversex, reversey);
+    }
+  }
+  /// draw modi
+  pub fn draw_modi(&self, xlt: i32, ylt: i32, xrt: i32, yrt: i32,
+    xrb: i32, yrb: i32, xlb: i32, ylb: i32, trans: i32) {
+    unsafe {
+      DrawModiGraph(xlt, ylt, xrt, yrt, xrb, yrb, xlb, ylb, self.h, trans);
+    }
+  }
+  /// draw rect
+  pub fn draw_rect(&self, x: i32, y: i32, srcx: i32, srcy: i32, w: i32, h: i32,
+    trans: i32, reversex: i32, reversey: i32) {
+    unsafe {
+      DrawRectGraph(x, y, srcx, srcy, w, h, self.h, trans, reversex, reversey);
+    }
+  }
+  /// draw rect extend
+  pub fn draw_rect_extend(&self, l: i32, t: i32, r: i32, b: i32,
+    srcx: i32, srcy: i32, w: i32, h: i32, trans: i32) {
+    unsafe {
+      DrawRectExtendGraph(l, t, r, b, srcx, srcy, w, h, self.h, trans);
     }
   }
   /// set to shader

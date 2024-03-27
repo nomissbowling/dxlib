@@ -103,6 +103,11 @@ pub fn screen(p: &str) -> Result<(), Box<dyn Error>> {
     ani[anim % ani.len()].draw(left, top, TRUE);
     gds.get_draw_screen(left, top, left + 64, top + 64, TRUE); // clipping
 
+    let g = dx.make_graph(480, 360, FALSE); // must be unreg inner allocation
+    g.get_draw_screen(80, 60, 560, 420, TRUE);
+    g.draw_rota(0, 0, 0.5, 0.0, TRUE, TRUE, TRUE);
+    dx.unreg(Box::new(g));
+
     set_draw_screen(DX_SCREEN_WORK);
     set_use_back_culling(TRUE); // small true is not same as 1 or TRUE
     // tex.set_to_shader(0); // single texture
@@ -142,6 +147,15 @@ pub fn screen(p: &str) -> Result<(), Box<dyn Error>> {
     for i in 0..demo::NFACES_CUBE {
       draw_polygon_3d_to_shader(&vss[i][0], demo::TPF_Q);
     }
+
+    grp.draw_turn(320, 0, TRUE);
+    grp.draw_extend(0, 480 - 60, 80, 480, TRUE);
+    tex.draw_rota(320, 0, 0.5, -m_pi as f64 / 4.0, TRUE, FALSE, FALSE);
+    tex.draw_modi(640 - 160, 240 - 60, 640 - 40, 240 - 60,
+      640, 240, 640 - 80, 240, TRUE);
+    tex.draw_rect(640 - 160, 240 - 120, 32, 32, 64, 64, TRUE, TRUE, TRUE);
+    tex.draw_rect_extend(640 - 240, 240 - 180, 640 - 160, 240 - 120,
+      32, 32, 64, 64, TRUE);
 
     screen_flip();
   }
