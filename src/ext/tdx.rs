@@ -3,7 +3,7 @@
 
 use std::ffi::c_void;
 use std::error::Error;
-use std::rc::Rc;
+use std::sync::Arc;
 use std::cell::RefCell;
 use std::collections::HashMap;
 
@@ -14,7 +14,7 @@ use crate::ext::graph::Graph;
 use crate::ext::shader::{VertexShader, PixelShader, GeometryShader};
 use crate::ext::font::Font;
 
-pub type RcTr = Rc<RefCell<Box<dyn Tr>>>;
+pub type RcTr = Arc<RefCell<Box<dyn Tr>>>;
 
 pub trait Tr {
   fn as_music(&self) -> Option<Music> { None }
@@ -67,7 +67,7 @@ impl Tdx {
 
   pub fn reg(&mut self, o: Box<dyn Tr>) -> RcTr {
     let h = o.handle();
-    self.tbl.insert(h, Rc::new(RefCell::new(o)));
+    self.tbl.insert(h, Arc::new(RefCell::new(o)));
     self.tbl.get(&h).expect("get").clone()
   }
 
