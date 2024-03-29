@@ -14,7 +14,7 @@ pub struct Music {
 /// Tr for Music
 impl Tr for Music {
   /// as music
-  fn as_music(&self) -> Option<Music> { Some(Music{d: false, h: self.h}) }
+  fn as_music(&self) -> Music { Music{d: false, h: self.h} }
 
   /// handle
   fn handle(&self) -> i32 { self.h }

@@ -14,7 +14,7 @@ pub struct Sound {
 /// Tr for Sound
 impl Tr for Sound {
   /// as sound
-  fn as_sound(&self) -> Option<Sound> { Some(Sound{d: false, h: self.h}) }
+  fn as_sound(&self) -> Sound { Sound{d: false, h: self.h} }
 
   /// handle
   fn handle(&self) -> i32 { self.h }

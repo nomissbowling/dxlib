@@ -14,7 +14,7 @@ pub struct Graph {
 /// Tr for Graph
 impl Tr for Graph {
   /// as graph
-  fn as_graph(&self) -> Option<Graph> { Some(Graph{d: false, h: self.h}) }
+  fn as_graph(&self) -> Graph { Graph{d: false, h: self.h} }
 
   /// handle
   fn handle(&self) -> i32 { self.h }

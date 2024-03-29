@@ -14,8 +14,8 @@ pub struct VertexShader {
 /// Tr for VertexShader
 impl Tr for VertexShader {
   /// as vertex shader
-  fn as_vertex_shader(&self) -> Option<VertexShader> {
-    Some(VertexShader{d: false, h: self.h})
+  fn as_vertex_shader(&self) -> VertexShader {
+    VertexShader{d: false, h: self.h}
   }
 
   /// handle
@@ -58,8 +58,8 @@ pub struct PixelShader {
 /// Tr for PixelShader
 impl Tr for PixelShader {
   /// as pixel shader
-  fn as_pixel_shader(&self) -> Option<PixelShader> {
-    Some(PixelShader{d: false, h: self.h})
+  fn as_pixel_shader(&self) -> PixelShader {
+    PixelShader{d: false, h: self.h}
   }
 
   /// handle
@@ -102,8 +102,8 @@ pub struct GeometryShader {
 /// Tr for GeometryShader
 impl Tr for GeometryShader {
   /// as geometry shader
-  fn as_geometry_shader(&self) -> Option<GeometryShader> {
-    Some(GeometryShader{d: false, h: self.h})
+  fn as_geometry_shader(&self) -> GeometryShader {
+    GeometryShader{d: false, h: self.h}
   }
 
   /// handle

@@ -14,7 +14,7 @@ pub struct Font {
 /// Tr for Font
 impl Tr for Font {
   /// as font
-  fn as_font(&self) -> Option<Font> { Some(Font{d: false, h: self.h}) }
+  fn as_font(&self) -> Font { Font{d: false, h: self.h} }
 
   /// handle
   fn handle(&self) -> i32 { self.h }

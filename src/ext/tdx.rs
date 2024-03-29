@@ -17,35 +17,16 @@ use crate::ext::font::Font;
 pub type RcTr = Arc<RefCell<Box<dyn Tr>>>;
 
 pub trait Tr {
-  fn as_music(&self) -> Option<Music> { None }
-  fn as_sound(&self) -> Option<Sound> { None }
-  fn as_graph(&self) -> Option<Graph> { None }
-  fn as_vertex_shader(&self) -> Option<VertexShader> { None }
-  fn as_pixel_shader(&self) -> Option<PixelShader> { None }
-  fn as_geometry_shader(&self) -> Option<GeometryShader> { None }
-  fn as_font(&self) -> Option<Font> { None }
+  fn as_music(&self) -> Music { panic!("music") }
+  fn as_sound(&self) -> Sound { panic!("sound") }
+  fn as_graph(&self) -> Graph { panic!("graph") }
+  fn as_vertex_shader(&self) -> VertexShader { panic!("vertex_shader") }
+  fn as_pixel_shader(&self) -> PixelShader { panic!("pixel_shader") }
+  fn as_geometry_shader(&self) -> GeometryShader { panic!("geometry_shader") }
+  fn as_font(&self) -> Font { panic!("font") }
 
   fn handle(&self) -> i32;
   fn dispose(&mut self);
-}
-
-impl Tr for RcTr {
-  fn as_music(&self) -> Option<Music> { self.borrow().as_music() }
-  fn as_sound(&self) -> Option<Sound> { self.borrow().as_sound() }
-  fn as_graph(&self) -> Option<Graph> { self.borrow().as_graph() }
-  fn as_vertex_shader(&self) -> Option<VertexShader> {
-    self.borrow().as_vertex_shader()
-  }
-  fn as_pixel_shader(&self) -> Option<PixelShader> {
-    self.borrow().as_pixel_shader()
-  }
-  fn as_geometry_shader(&self) -> Option<GeometryShader> {
-    self.borrow().as_geometry_shader()
-  }
-  fn as_font(&self) -> Option<Font> { self.borrow().as_font() }
-
-  fn handle(&self) -> i32 { self.borrow().handle() }
-  fn dispose(&mut self) { self.borrow_mut().dispose(); }
 }
 
 pub struct Tdx {
@@ -61,7 +42,7 @@ impl Tdx {
   pub fn unreg(&mut self, o: Box<dyn Tr>) {
     match self.tbl.remove(&o.handle()) {
     None => (), // or expect("unreg dup")
-    Some(mut v) => v.dispose()
+    Some(v) => v.borrow_mut().dispose()
     }
   }
 
@@ -73,18 +54,18 @@ impl Tdx {
 
   pub fn load_music_mem(&mut self, n: &String) -> Music {
     self.reg(Box::new(Music::load_mem(n)))
-    .as_music().expect("music")
+    .borrow().as_music()
   }
 
   pub fn load_sound_mem(&mut self, n: &String) -> Sound {
     self.reg(Box::new(Sound::load_mem(n)))
-    .as_sound().expect("sound")
+    .borrow().as_sound()
   }
 
   pub fn get_graph(&mut self, l: i32, t: i32, w: i32, h: i32,
     use_client_flag: i32, not_use_3d_flag: i32) -> Graph {
     let g = self.reg(Box::new(Graph::make(w, h, not_use_3d_flag)))
-    .as_graph().expect("graph");
+    .borrow().as_graph();
     g.get_draw_screen(l, t, l + w, t + h, use_client_flag);
     g
   }
@@ -92,12 +73,12 @@ impl Tdx {
   pub fn make_graph(&mut self, xsz: i32, ysz: i32,
     not_use_3d_flag: i32) -> Graph {
     self.reg(Box::new(Graph::make(xsz, ysz, not_use_3d_flag)))
-    .as_graph().expect("graph")
+    .borrow().as_graph()
   }
 
   pub fn load_graph(&mut self, n: &String) -> Graph {
     self.reg(Box::new(Graph::load(n)))
-    .as_graph().expect("graph")
+    .borrow().as_graph()
   }
 
   pub fn load_div_graph(&mut self, n: &String, allnum: i32,
@@ -109,40 +90,40 @@ impl Tdx {
       not_use_3d_flag, xstride, ystride); }
     handle_buf.into_iter().map(|h|
       self.reg(Box::new(Graph{d: true, h}))
-      .as_graph().expect("graph")).collect()
+      .borrow().as_graph()).collect()
   }
 
   pub fn load_vertex_shader(&mut self, n: &String) -> VertexShader {
     self.reg(Box::new(VertexShader::load(n)))
-    .as_vertex_shader().expect("vertex shader")
+    .borrow().as_vertex_shader()
   }
 
   pub fn load_pixel_shader(&mut self, n: &String) -> PixelShader {
     self.reg(Box::new(PixelShader::load(n)))
-    .as_pixel_shader().expect("pixel shader")
+    .borrow().as_pixel_shader()
   }
 
   pub fn load_geometry_shader(&mut self, n: &String) -> GeometryShader {
     self.reg(Box::new(GeometryShader::load(n)))
-    .as_geometry_shader().expect("geometry shader")
+    .borrow().as_geometry_shader()
   }
 
   pub fn create_font(&mut self, n: &str, sz: i32, thick: i32,
     fonttype: i32, charset: i32, edgesz: i32, italic: i32) -> Font {
     self.reg(
       Box::new(Font::create(n, sz, thick, fonttype, charset, edgesz, italic)))
-    .as_font().expect("font")
+    .borrow().as_font()
   }
 
   pub fn load_font(&mut self, n: &String) -> Font {
     self.reg(Box::new(Font::load_data(n)))
-    .as_font().expect("font")
+    .borrow().as_font()
   }
 }
 
 impl Drop for Tdx {
   fn drop(&mut self) {
-    for (_k, v) in self.tbl.iter_mut() { v.dispose(); }
+    for (_k, v) in self.tbl.iter_mut() { v.borrow_mut().dispose(); }
     unsafe { DxLib_End(); }
   }
 }
