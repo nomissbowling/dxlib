@@ -81,6 +81,14 @@ impl Tdx {
     .as_sound().expect("sound")
   }
 
+  pub fn get_graph(&mut self, l: i32, t: i32, w: i32, h: i32,
+    use_client_flag: i32, not_use_3d_flag: i32) -> Graph {
+    let g = self.reg(Box::new(Graph::make(w, h, not_use_3d_flag)))
+    .as_graph().expect("graph");
+    g.get_draw_screen(l, t, l + w, t + h, use_client_flag);
+    g
+  }
+
   pub fn make_graph(&mut self, xsz: i32, ysz: i32,
     not_use_3d_flag: i32) -> Graph {
     self.reg(Box::new(Graph::make(xsz, ysz, not_use_3d_flag)))

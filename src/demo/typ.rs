@@ -103,9 +103,13 @@ pub fn screen(p: &str) -> Result<(), Box<dyn Error>> {
     ani[anim % ani.len()].draw(left, top, TRUE);
     gds.get_draw_screen(left, top, left + 64, top + 64, TRUE); // clipping
 
-    let g = dx.make_graph(480, 360, FALSE); // must be unreg inner allocation
+    let g = dx.make_graph(480, 360, FALSE); // must unreg inner allocation
     g.get_draw_screen(80, 60, 560, 420, TRUE);
     g.draw_rota(0, 0, 0.5, 0.0, TRUE, TRUE, TRUE);
+    dx.unreg(Box::new(g));
+
+    let g = dx.get_graph(80, 60, 64, 64, TRUE, FALSE); // unreg inner
+    g.draw(160, 0, TRUE);
     dx.unreg(Box::new(g));
 
     set_draw_screen(DX_SCREEN_WORK);
