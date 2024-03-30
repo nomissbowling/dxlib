@@ -28,7 +28,8 @@ pub fn screen(p: &str) -> Result<(), Box<dyn Error>> {
     "shader_PS.pso\0",
     "shader_GS.gso\0",
     "_font_32_u8_0000.dft\0", // pre convert by CreateDXFontData.exe
-    "_img_256x256_16x64x64.png\0" // 12 scenes
+    "_img_256x256_16x64x64.png\0", // 12 scenes
+    "_img_64x64_64x8x8.png\0" // 64 scenes
   ].into_iter().map(|p|
     base.join(p).to_str().expect("str").to_string()).collect();
 
@@ -61,6 +62,9 @@ pub fn screen(p: &str) -> Result<(), Box<dyn Error>> {
   println!("fsys: {:08x} fdat: {:08x}", fsys.handle(), fdat.handle());
   let ani = dx.load_div_graph(&res[10], 12, 4, 3, 64, 64, FALSE, 0, 0);
   // for a in ani.iter() { println!("ani: {:08x}", a.handle()); }
+  let blk = dx.load_div_graph(&res[11], 64, 8, 8, 8, 8, FALSE, 0, 0);
+  // for b in blk.iter() { println!("blk: {:08x}", b.handle()); }
+  let bls = dx.make_graphs_from_div_graph(&blk, TRUE, TRUE, FALSE); // shader
   let gds = dx.make_graph(64, 64, FALSE); // empty for clipping
 
   select_midi_mode(DX_MIDIMODE_MCI);
@@ -87,7 +91,7 @@ pub fn screen(p: &str) -> Result<(), Box<dyn Error>> {
   for tick in 0..n * m {
     if process_message() != 0 { break; }
     clear_draw_screen(NULL);
-    set_draw_blend_mode(DX_BLENDMODE_NOBLEND, 0);
+    set_draw_blend_mode(DX_BLENDMODE_NOBLEND, 0); // not for shader
     // loss time test draw many pixel
     for r in 0..360 {
       for c in 0..480 {
@@ -117,7 +121,7 @@ pub fn screen(p: &str) -> Result<(), Box<dyn Error>> {
     // tex.set_to_shader(0); // single texture
     // [&grp, &tex][anim % 2].set_to_shader(0); // changing texture
     // ani[anim % ani.len()].set_to_shader(0); // transparent (black on black)
-    gds.set_to_shader(0); // clipped rect of 2d screen
+    // gds.set_to_shader(0); // clipped rect of 2d screen
     shv.set_shader();
     shp.set_shader();
     // shg.set_shader();
@@ -147,8 +151,14 @@ pub fn screen(p: &str) -> Result<(), Box<dyn Error>> {
     // create_viewport_matrix(&mut mv, cx, cy, w, h);
     // set_transform_to_viewport(&mv);
 
+    gds.set_to_shader(0); // clipped rect of 2d screen
     draw_polygon_3d_to_shader(&vert[0], demo::TPF_Q);
     for i in 0..demo::NFACES_CUBE {
+      if i == 0 {
+        gds.set_to_shader(0); // clipped rect of 2d screen
+      } else {
+        bls[(i * 8) % bls.len()].set_to_shader(0); // transparent
+      }
       draw_polygon_3d_to_shader(&vss[i][0], demo::TPF_Q);
     }
 

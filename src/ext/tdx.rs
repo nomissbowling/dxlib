@@ -10,7 +10,7 @@ use std::collections::HashMap;
 use crate::{dx::*, ext::*};
 use crate::ext::music::Music;
 use crate::ext::sound::Sound;
-use crate::ext::graph::Graph;
+use crate::ext::graph::{Screen, Graph};
 use crate::ext::shader::{VertexShader, PixelShader, GeometryShader};
 use crate::ext::font::Font;
 
@@ -19,6 +19,7 @@ pub type RcTr = Arc<RefCell<Box<dyn Tr>>>;
 pub trait Tr {
   fn as_music(&self) -> Music { panic!("music") }
   fn as_sound(&self) -> Sound { panic!("sound") }
+  fn as_screen(&self) -> Screen { panic!("screen") }
   fn as_graph(&self) -> Graph { panic!("graph") }
   fn as_vertex_shader(&self) -> VertexShader { panic!("vertex_shader") }
   fn as_pixel_shader(&self) -> PixelShader { panic!("pixel_shader") }
@@ -60,6 +61,26 @@ impl Tdx {
   pub fn load_sound_mem(&mut self, n: &String) -> Sound {
     self.reg(Box::new(Sound::load_mem(n)))
     .borrow().as_sound()
+  }
+
+  pub fn make_screen(&mut self, xsz: i32, ysz: i32, trans: i32) -> Screen {
+    self.reg(Box::new(Screen::make(xsz, ysz, trans)))
+    .borrow().as_screen()
+  }
+
+  /// inner change draw screen
+  pub fn make_graphs_from_div_graph(&mut self, vg: &Vec<Graph>,
+    trans: i32, use_client_flag: i32, not_use_3d_flag: i32) -> Vec<Graph> {
+    if vg.len() == 0 { return vec![] }
+    let (w, h) = vg[0].get_size();
+    let screen = self.make_screen(w, h, trans);
+    screen.set_draw();
+    let v = vg.iter().map(|src| {
+      src.draw(0, 0, trans);
+      self.get_graph(0, 0, w, h, use_client_flag, not_use_3d_flag)
+    }).collect();
+    self.unreg(Box::new(screen));
+    v
   }
 
   pub fn get_graph(&mut self, l: i32, t: i32, w: i32, h: i32,

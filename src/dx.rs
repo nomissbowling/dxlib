@@ -219,6 +219,8 @@ extern "stdcall" {
   pub fn StopSoundMem(sh: i32) -> i32;
   pub fn ChangeVolumeSoundMem(volumepal: i32, sh: i32) -> i32;
 
+  pub fn MakeScreen(xsz: i32, ysz: i32, trans: i32) -> i32;
+  pub fn GetGraphSize(gh: i32, xsz: *mut i32, ysz: *mut i32) -> i32;
   pub fn GetDrawScreenGraph(l: i32, t: i32, r: i32, b: i32,
     gh: i32, use_client_flag: i32) -> i32;
   pub fn MakeGraph(xsz: i32, ysz: i32, not_use_3d_flag: i32) -> i32;

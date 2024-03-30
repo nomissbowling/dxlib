@@ -3,6 +3,48 @@
 
 use crate::{dx::*, ext::tdx::*};
 
+/// Screen
+pub struct Screen {
+  /// to be disposed
+  pub d: bool,
+  /// handle
+  pub h: i32
+}
+
+/// Tr for Screen
+impl Tr for Screen {
+  /// as screen
+  fn as_screen(&self) -> Screen { Screen{d: false, h: self.h} }
+
+  /// handle
+  fn handle(&self) -> i32 { self.h }
+  /// dispose
+  fn dispose(&mut self) {
+    if self.d && self.h != 0 {
+      unsafe { DeleteGraph(self.h, FALSE); } // not exist DeleteScreen
+      self.h = 0;
+    }
+  }
+}
+
+/// Drop for Screen
+impl Drop for Screen {
+  /// drop
+  fn drop(&mut self) { self.dispose(); }
+}
+
+/// Screen
+impl Screen {
+  /// screen as graph for set draw screen
+  pub fn make(xsz: i32, ysz: i32, trans: i32) -> Self {
+    Screen{d: true, h: unsafe { MakeScreen(xsz, ysz, trans) } }
+  }
+  /// set draw
+  pub fn set_draw(&self) {
+    unsafe { SetDrawScreen(self.h); }
+  }
+}
+
 /// Graph
 pub struct Graph {
   /// to be disposed
@@ -94,5 +136,12 @@ impl Graph {
   /// set to shader
   pub fn set_to_shader(&self, i: i32) {
     unsafe { SetUseTextureToShader(i, self.h); }
+  }
+  /// get size
+  pub fn get_size(&self) -> (i32, i32) {
+    let mut w = 0i32;
+    let mut h = 0i32;
+    unsafe { GetGraphSize(self.h, &mut w as *mut i32, &mut h as *mut i32); }
+    (w, h)
   }
 }
