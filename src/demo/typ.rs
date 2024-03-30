@@ -62,7 +62,7 @@ pub fn screen(p: &str) -> Result<(), Box<dyn Error>> {
   println!("fsys: {:08x} fdat: {:08x}", fsys.handle(), fdat.handle());
   let ani = dx.load_div_graph(&res[10], 12, 4, 3, 64, 64, FALSE, 0, 0);
   // for a in ani.iter() { println!("ani: {:08x}", a.handle()); }
-  let blk = dx.load_div_graph(&res[11], 64, 8, 8, 8, 8, FALSE, 0, 0);
+  let blk = dx.load_div_graph(&res[11], 8, 1, 8, 8, 8, FALSE, 8, 0);
   // for b in blk.iter() { println!("blk: {:08x}", b.handle()); }
   let bls = dx.make_graphs_from_div_graph(&blk, TRUE, TRUE, FALSE); // shader
   let gds = dx.make_graph(64, 64, FALSE); // empty for clipping
@@ -157,7 +157,7 @@ pub fn screen(p: &str) -> Result<(), Box<dyn Error>> {
       if i == 0 {
         gds.set_to_shader(0); // clipped rect of 2d screen
       } else {
-        bls[(i * 8) % bls.len()].set_to_shader(0); // transparent
+        bls[i % bls.len()].set_to_shader(0); // transparent
       }
       draw_polygon_3d_to_shader(&vss[i][0], demo::TPF_Q);
     }
