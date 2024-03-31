@@ -70,7 +70,7 @@ impl FLOAT2 {
   pub fn get(v: &[f32; 2]) -> Self { FLOAT2::new(v[0], v[1]) }
 }
 
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, PartialEq)]
 #[repr(C)]
 pub struct COLOR_F {
   pub r: f32,
@@ -98,7 +98,7 @@ impl COLOR_F {
   }
 }
 
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, PartialEq)]
 #[repr(C)]
 pub struct COLOR_U8 {
   pub b: u8,
