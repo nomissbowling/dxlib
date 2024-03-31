@@ -98,6 +98,16 @@ impl COLOR_U8 {
   pub fn new(b: u8, g: u8, r: u8, a: u8) -> Self { COLOR_U8{b, g, r, a} }
   pub fn zeros() -> Self { COLOR_U8::new(0, 0, 0, 0) }
   pub fn get(v: &[u8; 4]) -> Self { COLOR_U8::new(v[2], v[1], v[0], v[3]) }
+  pub fn from_f4(f4: &[f32; 4]) -> Self {
+    let v = f4.iter().enumerate().map(|(i, &p)|
+      if i < 3 { (p + 2.0) as u32 * 255 / 4 }
+      else { 255 }
+      as u8).collect::<Vec<_>>();
+    COLOR_U8::new(v[2], v[1], v[0], v[3])
+  }
+  pub fn from_float4(p: &FLOAT4) -> Self {
+    COLOR_U8::from_f4(&[p.x, p.y, p.z, p.w])
+  }
 }
 
 #[derive(Debug, Clone)]
@@ -132,6 +142,17 @@ impl DOUBLE4 {
 
 #[derive(Debug, Clone)]
 #[repr(C)]
+pub struct VERTEX3D {
+  pub pos: VECTOR,
+  pub norm: VECTOR,
+  pub dif: COLOR_U8,
+  pub spc: COLOR_U8,
+  pub uv: FLOAT2, // u: f32, v: f32
+  pub suv: FLOAT2 // su: f32, sv: f32
+}
+
+#[derive(Debug, Clone)]
+#[repr(C)]
 pub struct VERTEX3DSHADER {
   pub pos: VECTOR,
   pub spos: FLOAT4,
@@ -142,6 +163,34 @@ pub struct VERTEX3DSHADER {
   pub spc: COLOR_U8,
   pub uv: FLOAT2, // u: f32, v: f32
   pub suv: FLOAT2 // su: f32, sv: f32
+}
+
+#[derive(Debug, Clone)]
+#[repr(C)]
+pub struct LIGHTPARAM {
+  pub light_type: i32,
+  pub diffuse: COLOR_F,
+  pub specular: COLOR_F,
+  pub ambient: COLOR_F,
+  pub position: VECTOR,
+  pub direction: VECTOR,
+  pub range: f32,
+  pub fall_off: f32,
+  pub attenuation0: f32,
+  pub attenuation1: f32,
+  pub attenuation2: f32,
+  pub theta: f32,
+  pub phi: f32
+}
+
+#[derive(Debug, Clone)]
+#[repr(C)]
+pub struct MATERIALPARAM {
+  pub diffuse: COLOR_F,
+  pub ambient: COLOR_F,
+  pub specular: COLOR_F,
+  pub emissive: COLOR_F,
+  pub power: f32
 }
 
 #[derive(Debug, Clone)]
@@ -248,6 +297,11 @@ extern "stdcall" {
   pub fn LoadGeometryShader(gso: *const u8) -> i32;
   pub fn DeleteShader(h: i32) -> i32;
 
+  pub fn SetMaterialUseVertDifColor(flg: i32) -> i32; // default TRUE
+  pub fn SetMaterialUseVertSpcColor(flg: i32) -> i32; // default TRUE
+  pub fn SetMaterialParam(mp: MATERIALPARAM) -> i32;
+  pub fn SetUseLighting(flg: i32) -> i32; // default TRUE
+
   pub fn SetUseBackCulling(flg: i32) -> i32;
   pub fn SetUseTextureToShader(stage: i32, gh: i32) -> i32;
   pub fn SetUseVertexShader(vsh: i32) -> i32;
@@ -269,6 +323,8 @@ extern "stdcall" {
   pub fn SetTransformToViewport(m: *const MATRIX) -> i32;
 
   pub fn DrawPolygon3DToShader(va: *const VERTEX3DSHADER, npolygons: i32) -> i32;
+  pub fn DrawPolygon3D(va: *const VERTEX3D, npolygons: i32,
+    gh: i32, trans: i32) -> i32;
 
   pub fn InitFontToHandle() -> i32;
   pub fn DeleteFontToHandle(fh: i32) -> i32;
@@ -282,6 +338,7 @@ extern "stdcall" {
 
   pub fn GetColor(r: i32, g: i32, b: i32) -> u32;
   pub fn DrawPixel(x: i32, y: i32, c: u32) -> i32;
+  pub fn DrawBox(l: i32, t: i32, r: i32, b: i32, c: u32, fill: i32) -> i32;
 
   /// private
   /// - [https://densanken.com/wiki/index.php?dx%A5%E9%A5%A4%A5%D6%A5%E9%A5%EA%B1%A3%A4%B7%B4%D8%BF%F4%A4%CE%A5%DA%A1%BC%A5%B8](https://densanken.com/wiki/index.php?dx%A5%E9%A5%A4%A5%D6%A5%E9%A5%EA%B1%A3%A4%B7%B4%D8%BF%F4%A4%CE%A5%DA%A1%BC%A5%B8)

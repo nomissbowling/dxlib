@@ -10,28 +10,38 @@ pub mod shader;
 pub mod font;
 pub mod tdx;
 
+/// UV
 pub type UV = FLOAT2;
+/// POS
 pub type POS = FLOAT4;
 
+/// VT
 #[derive(Debug, Clone)]
 #[repr(C)]
 pub struct VT {
+  /// pos
   pub pos: POS,
+  /// uv
   pub uv: UV
 }
 
+/// VT
 impl VT {
+  /// constructor
   pub fn new(pos: POS, uv: UV) -> Self { VT{pos, uv} }
+  /// zeros
   pub fn zeros() -> Self { VT::new(POS::zeros(), FLOAT2::zeros()) }
+  /// get
   pub fn get(f4: &[f32; 4], f2: &[f32; 2]) -> Self {
     VT::new(POS::get(f4), UV::get(f2))
   }
 }
 
-// set -Y to convert culling CCW(GL) to CW(DX) (front <-> back)
-// vts_gl 0 1 2 3 (0 1 2 2 3 0) to vss (0 3 2 2 1 0) or (3 2 0 1 0 2)
+/// set -Y to convert culling CCW(GL) to CW(DX) (front <-> back)
+/// - vts_gl 0 1 2 3 (0 1 2 2 3 0) to vss (0 3 2 2 1 0) or (3 2 0 1 0 2)
+/// - tex: true: texture color, false: vertex color
 pub fn vss_from_vts_gl(vts: &Vec<VT>, nfaces: usize, vpf: usize,
-  offset: &POS, scale: f32) -> Vec<Vec<VERTEX3DSHADER>> {
+  offset: &POS, scale: f32, tex: bool) -> Vec<Vec<VERTEX3DSHADER>> {
   let mut vss: Vec<Vec<VERTEX3DSHADER>> = vec![];
   let tbl: [usize; 4] = [0, 3, 2, 1];
   for i in 0..nfaces {
@@ -48,8 +58,9 @@ pub fn vss_from_vts_gl(vts: &Vec<VT>, nfaces: usize, vpf: usize,
       let tan = VECTOR::zeros();
       let binorm = VECTOR::zeros();
       // (all white and alpha max when use texture)
-      let dif = COLOR_U8::new(255, 255, 255, 255); // diffuse
-      let spc = COLOR_U8::zeros();
+      let dif = if tex { COLOR_U8::new(255, 255, 255, 255) } // diffuse
+        else { COLOR_U8::from_float4(&vts[k].pos) };
+      let spc = COLOR_U8::zeros(); // specular
       let uv = vts[k].uv.clone(); // texture UV
       let suv = FLOAT2::zeros();
       vs.push(VERTEX3DSHADER{pos, spos, norm, tan, binorm, dif, spc, uv, suv});

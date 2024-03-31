@@ -7,10 +7,11 @@ use std::path::PathBuf;
 use crate::{dx::*, ext::*, ext::tdx::*, demo};
 
 pub fn screen(p: &str) -> Result<(), Box<dyn Error>> {
+  let tex_mode = true; // true: texture color, false: vertex color
   let vert = demo::gen_vert();
   let vts_gl = demo::gen_vts_gl();
   let vss = vss_from_vts_gl(&vts_gl, demo::NFACES_CUBE, demo::VPF_VTS,
-    &POS::new(0.0, 0.0, 0.0, 1.0), 128.0);
+    &POS::new(0.0, 0.0, 0.0, 1.0), 128.0, tex_mode);
 
   assert_eq!(vert.len(), demo::VPF_Q);
   assert_eq!(vts_gl.len(), demo::VPF_VTS * demo::NFACES_CUBE);
@@ -66,6 +67,8 @@ pub fn screen(p: &str) -> Result<(), Box<dyn Error>> {
   // for b in blk.iter() { println!("blk: {:08x}", b.handle()); }
   let bls = dx.make_graphs_from_div_graph(&blk, TRUE, TRUE, FALSE); // shader
   let gds = dx.make_graph(64, 64, FALSE); // empty for clipping
+  let twh = dx.make_graph_color(64, 64, get_color(255, 255, 255),
+    TRUE, TRUE, FALSE); // white texture (through vertex color)
 
   select_midi_mode(DX_MIDIMODE_MCI);
   bgm.volume(96);
@@ -154,10 +157,14 @@ pub fn screen(p: &str) -> Result<(), Box<dyn Error>> {
     gds.set_to_shader(0); // clipped rect of 2d screen
     draw_polygon_3d_to_shader(&vert[0], demo::TPF_Q);
     for i in 0..demo::NFACES_CUBE {
-      if i == 0 {
-        gds.set_to_shader(0); // clipped rect of 2d screen
+      if tex_mode {
+        if i == 0 {
+          gds.set_to_shader(0); // clipped rect of 2d screen
+        } else {
+          bls[i % bls.len()].set_to_shader(0); // transparent
+        }
       } else {
-        bls[i % bls.len()].set_to_shader(0); // transparent
+        twh.set_to_shader(0); // white texture (through vertex color)
       }
       draw_polygon_3d_to_shader(&vss[i][0], demo::TPF_Q);
     }

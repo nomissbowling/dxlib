@@ -69,6 +69,17 @@ impl Tdx {
   }
 
   /// inner change draw screen
+  pub fn make_graph_color(&mut self, xsz: i32, ysz: i32, c: u32,
+    trans: i32, use_client_flag: i32, not_use_3d_flag: i32) -> Graph {
+    let screen = self.make_screen(xsz, ysz, trans);
+    screen.set_draw();
+    draw_box(0, 0, xsz, ysz, c, TRUE);
+    let g = self.get_graph(0, 0, xsz, ysz, use_client_flag, not_use_3d_flag);
+    self.unreg(Box::new(screen));
+    g
+  }
+
+  /// inner change draw screen
   pub fn make_graphs_from_div_graph(&mut self, vg: &Vec<Graph>,
     trans: i32, use_client_flag: i32, not_use_3d_flag: i32) -> Vec<Graph> {
     if vg.len() == 0 { return vec![] }
@@ -223,6 +234,23 @@ pub fn init_shader() -> i32 {
   unsafe { InitShader() }
 }
 
+pub fn set_material_use_vert_dif_color(flg: i32) -> i32 {
+  unsafe { SetMaterialUseVertDifColor(flg) }
+}
+
+pub fn set_material_use_vert_spc_color(flg: i32) -> i32 {
+  unsafe { SetMaterialUseVertSpcColor(flg) }
+}
+
+/// (move)
+pub fn set_material_param(mp: MATERIALPARAM) -> i32 {
+  unsafe { SetMaterialParam(mp) }
+}
+
+pub fn set_use_lighting(flg: i32) -> i32 {
+  unsafe { SetUseLighting(flg) }
+}
+
 pub fn set_use_back_culling(f: i32) -> i32 {
   unsafe { SetUseBackCulling(f) }
 }
@@ -273,6 +301,11 @@ pub fn draw_polygon_3d_to_shader(va: &VERTEX3DSHADER, npolygons: i32) -> i32 {
   unsafe { DrawPolygon3DToShader(va as *const VERTEX3DSHADER, npolygons) }
 }
 
+pub fn draw_polygon_3d(va: &VERTEX3D, npolygons: i32,
+  gh: i32, trans: i32) -> i32 {
+  unsafe { DrawPolygon3D(va as *const VERTEX3D, npolygons, gh, trans) }
+}
+
 pub fn init_font_to_handle() -> i32 {
   unsafe { InitFontToHandle() }
 }
@@ -283,6 +316,10 @@ pub fn get_color(r: i32, g: i32, b: i32) -> u32 {
 
 pub fn draw_pixel(x: i32, y: i32, c: u32) -> i32 {
   unsafe { DrawPixel(x, y, c) }
+}
+
+pub fn draw_box(l: i32, t: i32, r: i32, b: i32, c: u32, fill: i32) -> i32 {
+  unsafe { DrawBox(l, t, r, b, c, fill) }
 }
 
 pub fn set_window_style_mode(s: i32) -> i32 {

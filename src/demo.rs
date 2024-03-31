@@ -24,7 +24,7 @@ pub fn gen_vert() -> Vec<VERTEX3DSHADER> {
     let tan = VECTOR::zeros();
     let binorm = VECTOR::zeros();
     let dif = COLOR_U8::get(&t.1); // diffuse (blend vetex color with texture)
-    let spc = COLOR_U8::zeros();
+    let spc = COLOR_U8::zeros(); // specular
     let uv = FLOAT2::get(&t.2); // texture UV shape Z CW + CCW
     let suv = FLOAT2::zeros();
     VERTEX3DSHADER{pos, spos, norm, tan, binorm, dif, spc, uv, suv}
