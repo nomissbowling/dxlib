@@ -88,13 +88,10 @@ impl COLOR_F {
       c as f32 / 255.0).collect::<Vec<_>>();
     COLOR_F::new(v[0], v[1], v[2], v[3])
   }
-  pub fn from_f4(f4: &[f32; 4]) -> Self {
-    let v = f4.iter().enumerate().map(|(i, &p)|
-      if i < 3 { (p + 2.0) / 4.0 } else { 1.0 }).collect::<Vec<_>>();
-    COLOR_F::new(v[0], v[1], v[2], v[3])
-  }
   pub fn from_float4(p: &FLOAT4) -> Self {
-    COLOR_F::from_f4(&[p.x, p.y, p.z, p.w])
+    let v = [p.x, p.y, p.z, p.w].iter().enumerate().map(|(i, &c)|
+      if i < 3 { (c + 2.0) / 4.0 } else { 1.0 }).collect::<Vec<_>>();
+    COLOR_F::new(v[0], v[1], v[2], v[3])
   }
 }
 

@@ -25,8 +25,6 @@ mod tests {
     assert_eq!(COLOR_F::new(0.0, 0.0, 1.0, 1.0),
       COLOR_F::from_u8(&COLOR_U8::new(255, 0, 0, 255)));
     assert_eq!(COLOR_F::new(0.0, 0.0, 1.0, 1.0),
-      COLOR_F::from_f4(&[-2.0, -2.0, 2.0, 1.0]));
-    assert_eq!(COLOR_F::new(0.0, 0.0, 1.0, 1.0),
       COLOR_F::from_float4(&FLOAT4::new(-2.0, -2.0, 2.0, 1.0)));
   }
 
