@@ -83,6 +83,19 @@ impl COLOR_F {
   pub fn new(r: f32, g: f32, b: f32, a: f32) -> Self { COLOR_F{r, g, b, a} }
   pub fn zeros() -> Self { COLOR_F::new(0.0, 0.0, 0.0, 0.0) }
   pub fn get(v: &[f32; 4]) -> Self { COLOR_F::new(v[0], v[1], v[2], v[3]) }
+  pub fn from_u8(u: &COLOR_U8) -> Self {
+    let v = [u.r, u.g, u.b, u.a].iter().map(|&c|
+      c as f32 / 255.0).collect::<Vec<_>>();
+    COLOR_F::new(v[0], v[1], v[2], v[3])
+  }
+  pub fn from_f4(f4: &[f32; 4]) -> Self {
+    let v = f4.iter().enumerate().map(|(i, &p)|
+      if i < 3 { (p + 2.0) / 4.0 } else { 1.0 }).collect::<Vec<_>>();
+    COLOR_F::new(v[0], v[1], v[2], v[3])
+  }
+  pub fn from_float4(p: &FLOAT4) -> Self {
+    COLOR_F::from_f4(&[p.x, p.y, p.z, p.w])
+  }
 }
 
 #[derive(Debug, Clone)]
@@ -98,15 +111,19 @@ impl COLOR_U8 {
   pub fn new(b: u8, g: u8, r: u8, a: u8) -> Self { COLOR_U8{b, g, r, a} }
   pub fn zeros() -> Self { COLOR_U8::new(0, 0, 0, 0) }
   pub fn get(v: &[u8; 4]) -> Self { COLOR_U8::new(v[2], v[1], v[0], v[3]) }
-  pub fn from_f4(f4: &[f32; 4]) -> Self {
-    let v = f4.iter().enumerate().map(|(i, &p)|
-      if i < 3 { (p + 2.0) as u32 * 255 / 4 }
-      else { 255 }
-      as u8).collect::<Vec<_>>();
-    COLOR_U8::new(v[2], v[1], v[0], v[3])
+  pub fn from_f(f: &COLOR_F) -> Self {
+    let v = [f.b, f.g, f.r, f.a].iter().map(|&c|
+      (c * 255.0) as u8).collect::<Vec<_>>();
+    COLOR_U8::new(v[0], v[1], v[2], v[3])
   }
   pub fn from_float4(p: &FLOAT4) -> Self {
-    COLOR_U8::from_f4(&[p.x, p.y, p.z, p.w])
+    COLOR_U8::from_f(&COLOR_F::from_float4(p))
+  }
+  pub fn from_u32(u: u32) -> Self {
+    unsafe { (*(&u as *const u32 as *const COLOR_U8)).clone() }
+  }
+  pub fn as_u32(&self) -> u32 {
+    unsafe { *(&self.b as *const u8 as *const u32) }
   }
 }
 
