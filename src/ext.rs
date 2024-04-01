@@ -37,17 +37,17 @@ impl VT {
   }
 }
 
-/// set -Y to convert culling CCW(GL) to CW(DX) (front <-> back)
+/// set -Y to convert culling CCW(GL) to CW(DX) (front &lt;-&gt; back)
 /// - vts_gl 0 1 2 3 (0 1 2 2 3 0) to vss (0 3 2 2 1 0) or (3 2 0 1 0 2)
 /// - tex: true: texture color, false: vertex color
 pub fn vss_from_vts_gl(vts: &Vec<VT>, nfaces: usize, vpf: usize,
   offset: &POS, scale: f32, tex: bool) -> Vec<Vec<VERTEX3DSHADER>> {
   let mut vss: Vec<Vec<VERTEX3DSHADER>> = vec![];
-  let tbl: [usize; 4] = [0, 3, 2, 1];
+  let tbl: Vec<usize> = vec![0, 3, 2, 2, 1, 0]; // vpf + 2 (add 2 vertices)
   for i in 0..nfaces {
     let mut vs: Vec<VERTEX3DSHADER> = vec![];
-    for j in 0..vpf {
-      let k = i * vpf + tbl[j]; // j[0 1 2 3] to vts[k] as [nfaces][0 3 2 1]
+    for &j in tbl.iter() {
+      let k = i * vpf + j; // vts[k] as [nfaces][0 3 2 2 1 0]
       let p = [
         offset.x + vts[k].pos.x * scale,
         offset.y - vts[k].pos.y * scale, // CCW to CW (front <-> back)
@@ -65,10 +65,6 @@ pub fn vss_from_vts_gl(vts: &Vec<VT>, nfaces: usize, vpf: usize,
       let suv = FLOAT2::zeros();
       vs.push(VERTEX3DSHADER{pos, spos, norm, tan, binorm, dif, spc, uv, suv});
     }
-    // add 2 vertices to make shape <> as CW + CW {0 3 2 1} (0 3 2 2 1 0)
-    vs.push(vs[3].clone()); // vs[4]
-    vs.push(vs[0].clone()); // vs[5]
-    vs[3] = vs[2].clone(); // vs[3]
     vss.push(vs);
   }
   vss

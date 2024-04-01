@@ -9,6 +9,9 @@ use crate::{dx::*, ext::*, ext::tdx::*, demo};
 pub fn screen(p: &str) -> Result<(), Box<dyn Error>> {
   let tex_mode = true; // true: texture color, false: vertex color
   let vert = demo::gen_vert();
+  let vert_gl = demo::gen_vert_gl();
+  let vgl = vss_from_vts_gl(&vert_gl, 1, demo::VPF_VTS,
+    &POS::new(0.0, 64.0, 0.0, 1.0), 128.0, tex_mode);
   let vts_gl = demo::gen_vts_gl();
   let vss = vss_from_vts_gl(&vts_gl, demo::NFACES_CUBE, demo::VPF_VTS,
     &POS::new(0.0, 0.0, 0.0, 1.0), 128.0, tex_mode);
@@ -154,8 +157,13 @@ pub fn screen(p: &str) -> Result<(), Box<dyn Error>> {
     // create_viewport_matrix(&mut mv, cx, cy, w, h);
     // set_transform_to_viewport(&mv);
 
-    gds.set_to_shader(0); // clipped rect of 2d screen
+    if tex_mode {
+      gds.set_to_shader(0); // clipped rect of 2d screen
+    } else {
+      twh.set_to_shader(0); // white texture (through vertex color)
+    }
     draw_polygon_3d_to_shader(&vert[0], demo::TPF_Q);
+    draw_polygon_3d_to_shader(&vgl[0][0], demo::TPF_Q);
     for i in 0..demo::NFACES_CUBE {
       if tex_mode {
         if i == 0 {

@@ -11,6 +11,7 @@ pub const VPF_Q: usize = 3 * TPF_Q as usize; // vertices per face quad
 pub const VPF_VTS: usize = 4; // vertices per face of vts
 pub const NFACES_CUBE: usize = 6; // faces of cube
 
+/// square bended shape Z (not gl order)
 pub fn gen_vert() -> Vec<VERTEX3DSHADER> {
   let mut vert: Vec<VERTEX3DSHADER> = [ // (shape, diffuse, texture)
     ([-128.0, -256.0, 128.0], [255, 255, 255, 255], [0.0, 0.0]),
@@ -35,6 +36,18 @@ pub fn gen_vert() -> Vec<VERTEX3DSHADER> {
   vert
 }
 
+/// square bended shape &lt;&gt; (gl order)
+pub fn gen_vert_gl() -> Vec<VT> {
+  let vert_gl: Vec<VT> = [ // (for GL)
+    ([-1.0, -1.5, 0.0, 1.0], [0.0, 1.0]),
+    ([-1.0, -2.0, 1.0, 1.0], [1.0, 1.0]),
+    ([1.0, -2.0, 0.0, 1.0], [1.0, 0.0]),
+    ([1.0, -1.5, -0.5, 1.0], [0.0, 0.0])
+  ].iter().map(|t| VT::get(&t.0, &t.1)).collect();
+  vert_gl
+}
+
+/// square x 6 (gl order)
 pub fn gen_vts_gl() -> Vec<VT> {
   let vts_gl: Vec<VT> = [ // (for GL) FrontFace::Ccw culling Face::Back
     // +X (1, 0, 0) right
