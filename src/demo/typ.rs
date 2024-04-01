@@ -8,16 +8,22 @@ use crate::{dx::*, ext::*, ext::tdx::*, demo};
 
 pub fn screen(p: &str) -> Result<(), Box<dyn Error>> {
   let tex_mode = true; // true: texture color, false: vertex color
-  let vert = demo::gen_vert();
+  let (dx_np, vert) = demo::gen_vert();
   let vert_gl = demo::gen_vert_gl();
-  let vgl = vss_from_vts_gl(&vert_gl, 1, demo::VPF_VTS,
+  let (vgl_np, vgl) = vss_from_vts_gl(&vert_gl, 1, vert_gl.len(),
     &POS::new(0.0, 64.0, 0.0, 1.0), 128.0, tex_mode);
+  let poly_gl = demo::gen_poly_gl(5);
+  let (pgl_np, pgl) = vss_from_vts_gl(&poly_gl, 1, poly_gl.len(),
+    &POS::new(0.0, -64.0, -224.0, 1.0), 64.0, tex_mode);
   let vts_gl = demo::gen_vts_gl();
-  let vss = vss_from_vts_gl(&vts_gl, demo::NFACES_CUBE, demo::VPF_VTS,
+  let (vs_np, vss) = vss_from_vts_gl(&vts_gl, demo::NFACES_CUBE, demo::VPF_VTS,
     &POS::new(0.0, 0.0, 0.0, 1.0), 128.0, tex_mode);
 
   assert_eq!(vert.len(), demo::VPF_Q);
+  assert_eq!(vgl[0].len(), 3 * (vert_gl.len() - 2));
+  assert_eq!(pgl[0].len(), 3 * (poly_gl.len() - 2));
   assert_eq!(vts_gl.len(), demo::VPF_VTS * demo::NFACES_CUBE);
+  assert_eq!(vss[0].len(), 3 * (demo::VPF_VTS - 2));
   assert_eq!(vss.len(), demo::NFACES_CUBE);
 
   let base = PathBuf::from(p);
@@ -162,8 +168,9 @@ pub fn screen(p: &str) -> Result<(), Box<dyn Error>> {
     } else {
       twh.set_to_shader(0); // white texture (through vertex color)
     }
-    draw_polygon_3d_to_shader(&vert[0], demo::TPF_Q);
-    draw_polygon_3d_to_shader(&vgl[0][0], demo::TPF_Q);
+    draw_polygon_3d_to_shader(&vert[0], dx_np);
+    draw_polygon_3d_to_shader(&vgl[0][0], vgl_np);
+    draw_polygon_3d_to_shader(&pgl[0][0], pgl_np);
     for i in 0..demo::NFACES_CUBE {
       if tex_mode {
         if i == 0 {
@@ -174,7 +181,7 @@ pub fn screen(p: &str) -> Result<(), Box<dyn Error>> {
       } else {
         twh.set_to_shader(0); // white texture (through vertex color)
       }
-      draw_polygon_3d_to_shader(&vss[i][0], demo::TPF_Q);
+      draw_polygon_3d_to_shader(&vss[i][0], vs_np);
     }
 
     grp.draw_turn(320, 0, TRUE);

@@ -6,9 +6,9 @@ use std::path::PathBuf;
 use crate::{dx::*, ext::*, demo};
 
 pub fn screen(p: &str) {
-  let vert = demo::gen_vert();
+  let (dx_np, vert) = demo::gen_vert();
   let vts_gl = demo::gen_vts_gl();
-  let vss = vss_from_vts_gl(&vts_gl, demo::NFACES_CUBE, demo::VPF_VTS,
+  let (vs_np, vss) = vss_from_vts_gl(&vts_gl, demo::NFACES_CUBE, demo::VPF_VTS,
     &POS::new(0.0, 0.0, 0.0, 1.0), 128.0, true);
 
   assert_eq!(vert.len(), demo::VPF_Q);
@@ -123,9 +123,9 @@ unsafe {
     // CreateViewportMatrix(&mut mv as *mut MATRIX, cx, cy, w, h);
     // SetTransformToViewport(&mv as *const MATRIX);
 
-    DrawPolygon3DToShader(&vert[0] as *const VERTEX3DSHADER, demo::TPF_Q);
+    DrawPolygon3DToShader(&vert[0] as *const VERTEX3DSHADER, dx_np);
     for i in 0..demo::NFACES_CUBE {
-      DrawPolygon3DToShader(&vss[i][0], demo::TPF_Q);
+      DrawPolygon3DToShader(&vss[i][0], vs_np);
     }
 
     ScreenFlip();

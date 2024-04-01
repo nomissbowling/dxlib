@@ -38,16 +38,23 @@ impl VT {
 }
 
 /// set -Y to convert culling CCW(GL) to CW(DX) (front &lt;-&gt; back)
-/// - vts_gl 0 1 2 3 (0 1 2 2 3 0) to vss (0 3 2 2 1 0) or (3 2 0 1 0 2)
+/// - vts_gl 0 1 2 3 (1 2 0 2 3 0) to vss (0 3 2 0 2 1)
 /// - tex: true: texture color, false: vertex color
+/// - result (npolys, vss): (i32, Vec&lt;Vec&lt;VERTEX3DSHADER&gt;&gt;)
 pub fn vss_from_vts_gl(vts: &Vec<VT>, nfaces: usize, vpf: usize,
-  offset: &POS, scale: f32, tex: bool) -> Vec<Vec<VERTEX3DSHADER>> {
+  offset: &POS, scale: f32, tex: bool) -> (i32, Vec<Vec<VERTEX3DSHADER>>) {
   let mut vss: Vec<Vec<VERTEX3DSHADER>> = vec![];
-  let tbl: Vec<usize> = vec![0, 3, 2, 2, 1, 0]; // vpf + 2 (add 2 vertices)
+  let npolys = vpf - 2;
+  let mut tbl: Vec<usize> = vec![0; 3 * npolys];
+  for i in 0..npolys {
+    tbl[i * 3] = 0;
+    tbl[i * 3 + 1] = vpf - 1 - i;
+    tbl[i * 3 + 2] = vpf - 2 - i;
+  }
   for i in 0..nfaces {
     let mut vs: Vec<VERTEX3DSHADER> = vec![];
     for &j in tbl.iter() {
-      let k = i * vpf + j; // vts[k] as [nfaces][0 3 2 2 1 0]
+      let k = i * vpf + j; // vts[k] as [nfaces][0 3 2 0 2 1]
       let p = [
         offset.x + vts[k].pos.x * scale,
         offset.y - vts[k].pos.y * scale, // CCW to CW (front <-> back)
@@ -67,5 +74,5 @@ pub fn vss_from_vts_gl(vts: &Vec<VT>, nfaces: usize, vpf: usize,
     }
     vss.push(vs);
   }
-  vss
+  (npolys as i32, vss)
 }
