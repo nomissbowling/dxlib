@@ -7,12 +7,12 @@ use crate::{dx::*, ext::*, demo};
 
 pub fn screen(p: &str) {
   let vert = demo::gen_vert();
-  let vts_gl = demo::gen_vts_gl();
-  let vss = vss_from_vts_gl(&vts_gl, demo::NFACES_CUBE, demo::VPF_VTS,
+  let vec_vts_gl = demo::gen_vec_vts_gl();
+  let vss = from_vec_vts_gl(&vec_vts_gl,
     &POS::new(0.0, 0.0, 0.0, 1.0), 128.0, true);
 
   assert_eq!(vert.len(), demo::VPF_Q);
-  assert_eq!(vts_gl.len(), demo::VPF_VTS * demo::NFACES_CUBE);
+  assert_eq!(vec_vts_gl.len(), demo::NFACES_CUBE);
   assert_eq!(vss.len(), demo::NFACES_CUBE);
 
   let base = PathBuf::from(p);

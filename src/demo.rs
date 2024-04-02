@@ -60,8 +60,8 @@ pub fn gen_poly_gl(n: usize) -> Vec<VT> {
 }
 
 /// square x 6 (gl order)
-pub fn gen_vts_gl() -> Vec<VT> {
-  let vts_gl: Vec<VT> = [ // (for GL) FrontFace::Ccw culling Face::Back
+pub fn gen_vec_vts_gl() -> Vec<Vec<VT>> {
+  let vts_gl = [ // (for GL) FrontFace::Ccw culling Face::Back
     // +X (1, 0, 0) right
     ([1.0, -1.0, 1.0, 1.0], [0.0, 1.0]),
     ([1.0, -1.0, -1.0, 1.0], [1.0, 1.0]),
@@ -92,6 +92,10 @@ pub fn gen_vts_gl() -> Vec<VT> {
     ([1.0, 1.0, -1.0, 1.0], [1.0, 1.0]),
     ([1.0, -1.0, -1.0, 1.0], [1.0, 0.0]),
     ([-1.0, -1.0, -1.0, 1.0], [0.0, 0.0])
-  ].iter().map(|t| VT::get(&t.0, &t.1)).collect();
-  vts_gl
+  ];
+  (0..6).into_iter().map(|f|
+    (0..4).into_iter().map(|i| {
+      let t = vts_gl[f * 4 + i];
+      VT::get(&t.0, &t.1)
+    }).collect::<Vec<_>>()).collect::<Vec<_>>()
 }
