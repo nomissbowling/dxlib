@@ -245,6 +245,9 @@ impl MATRIX_D {
 
 #[link(name="DxLib_x64_R.dll", kind="dylib")]
 extern "stdcall" {
+  pub fn SetUseNormalDrawShader(flg: i32) -> i32; // flg=TRUE
+  pub fn SetUseSoftwareRenderModeFlag(flg: i32) -> i32; // flg=FALSE
+
   pub fn DxLib_Init() -> i32;
   pub fn DxLib_End() -> i32;
   pub fn ChangeWindowMode(Flag: i32) -> i32;
@@ -317,10 +320,18 @@ extern "stdcall" {
   pub fn SetUseLighting(flg: i32) -> i32; // default TRUE
 
   pub fn SetUseBackCulling(flg: i32) -> i32;
+  pub fn SetRenderTargetToShader(target_index: i32, draw_screen: i32,
+    surface_index: i32, mip_level: i32) -> i32; // surface_index=0, mip_level=0
   pub fn SetUseTextureToShader(stage: i32, gh: i32) -> i32;
   pub fn SetUseVertexShader(vsh: i32) -> i32;
   pub fn SetUsePixelShader(psh: i32) -> i32;
   pub fn SetUseGeometryShader(gsh: i32) -> i32;
+
+  pub fn SetUseZBufferFlag(flg: i32) -> i32; // flg=FALSE (2D 3D)
+  pub fn SetWriteZBufferFlag(flg: i32) -> i32; // flg=FALSE (2D 3D)
+  pub fn SetUseZBuffer3D(flg: i32) -> i32; // flg=FALSE (3D)
+  pub fn SetWriteZBuffer3D(flg: i32) -> i32; // flg=FALSE (3D)
+  pub fn SetDrawZ(z: f32) -> i32; // z=0.2 (2D)
 
   pub fn CreateLookAtMatrix(o: *mut MATRIX,
     eye: *const VECTOR, at: *const VECTOR, up: *const VECTOR) -> i32;

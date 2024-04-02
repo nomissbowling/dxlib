@@ -95,6 +95,11 @@ pub fn screen(p: &str) -> Result<(), Box<dyn Error>> {
   for tick in 0..n * m {
     if process_message() != 0 { break; }
     clear_draw_screen(NULL);
+    set_use_z_buffer_3d(TRUE);
+    set_write_z_buffer_3d(TRUE);
+    // set_use_z_buffer_flag(TRUE);
+    // set_write_z_buffer_flag(TRUE);
+    // set_draw_z(0.2);
     set_draw_blend_mode(DX_BLENDMODE_NOBLEND, 0); // not for shader
     // loss time test draw many pixel
     for r in 0..360 {

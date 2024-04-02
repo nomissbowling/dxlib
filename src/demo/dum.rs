@@ -76,6 +76,11 @@ unsafe {
   for i in 0..640 {
     if ProcessMessage() != 0 { break; }
     ClearDrawScreen(NULL);
+    SetUseZBuffer3D(TRUE);
+    SetWriteZBuffer3D(TRUE);
+    // SetUseZBufferFlag(TRUE);
+    // SetWriteZBufferFlag(TRUE);
+    // SetDrawZ(0.2);
     // loss time test draw many pixel
     for r in 0..240 {
       for c in 0..320 {

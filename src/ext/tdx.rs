@@ -160,6 +160,16 @@ impl Drop for Tdx {
   }
 }
 
+/// flg=TRUE
+pub fn set_use_normal_draw_shader(flg: i32) -> i32 {
+  unsafe { SetUseNormalDrawShader(flg) }
+}
+
+/// flg=FALSE
+pub fn set_use_software_render_mode_flag(flg: i32) -> i32 {
+  unsafe { SetUseSoftwareRenderModeFlag(flg) }
+}
+
 pub fn change_window_mode(f: i32) -> i32 {
   unsafe { ChangeWindowMode(f) }
 }
@@ -253,6 +263,40 @@ pub fn set_use_lighting(flg: i32) -> i32 {
 
 pub fn set_use_back_culling(f: i32) -> i32 {
   unsafe { SetUseBackCulling(f) }
+}
+
+/// surface_index=0, mip_level=0
+pub fn set_render_target_to_shader(target_index: i32, draw_screen: i32,
+  surface_index: i32, mip_level: i32) -> i32 {
+  unsafe {
+    SetRenderTargetToShader(target_index, draw_screen,
+      surface_index, mip_level)
+  }
+}
+
+/// flg=FALSE (2D 3D)
+pub fn set_use_z_buffer_flag(flg: i32) -> i32 {
+  unsafe { SetUseZBufferFlag(flg) }
+}
+
+/// flg=FALSE (2D 3D)
+pub fn set_write_z_buffer_flag(flg: i32) -> i32 {
+  unsafe { SetWriteZBufferFlag(flg) }
+}
+
+/// flg=FALSE (3D)
+pub fn set_use_z_buffer_3d(flg: i32) -> i32 {
+  unsafe { SetUseZBuffer3D(flg) }
+}
+
+/// flg=FALSE (3D)
+pub fn set_write_z_buffer_3d(flg: i32) -> i32 {
+  unsafe { SetWriteZBuffer3D(flg) }
+}
+
+/// z=0.2 (2D)
+pub fn set_draw_z(z: f32) -> i32 {
+  unsafe { SetDrawZ(z) }
 }
 
 pub fn create_look_at_matrix(o: &mut MATRIX,
