@@ -13,6 +13,8 @@ pub fn screen(p: &str) -> Result<(), Box<dyn Error>> {
     &POS::new(0.0, 64.0, 0.0, 1.0), 128.0, tex_mode);
   let pgl = from_vts_gl(&demo::gen_poly_gl(5),
     &POS::new(0.0, -64.0, -224.0, 1.0), 64.0, tex_mode);
+  let agl = from_vec_vts_gl(&demo::gen_any_face(),
+    &POS::new(0.0, 0.0, 48.0, 1.0), 96.0, tex_mode);
   let vss = from_vec_vts_gl(&demo::gen_vec_vts_gl(),
     &POS::new(0.0, 0.0, 0.0, 1.0), 128.0, tex_mode);
 
@@ -161,6 +163,18 @@ pub fn screen(p: &str) -> Result<(), Box<dyn Error>> {
     draw_polygon_3d_to_shader(&vert);
     draw_polygon_3d_to_shader(&vgl);
     draw_polygon_3d_to_shader(&pgl);
+    for (i, vs) in agl.iter().enumerate() {
+      if tex_mode {
+        if i < agl.len() - 1 {
+          bls[i % bls.len()].set_to_shader(0); // transparent
+        } else {
+          gds.set_to_shader(0); // clipped rect of 2d screen
+        }
+      } else {
+        twh.set_to_shader(0); // white texture (through vertex color)
+      }
+      draw_polygon_3d_to_shader(vs);
+    }
     for (i, vs) in vss.iter().enumerate() {
       if tex_mode {
         if i == 0 {
