@@ -297,13 +297,16 @@ pub fn set_transform_to_viewport(m: &MATRIX) -> i32 {
   unsafe { SetTransformToViewport(m as *const MATRIX) }
 }
 
-pub fn draw_polygon_3d_to_shader(va: &VERTEX3DSHADER, npolygons: i32) -> i32 {
-  unsafe { DrawPolygon3DToShader(va as *const VERTEX3DSHADER, npolygons) }
+pub fn draw_polygon_3d_to_shader(va: &Vec<VERTEX3DSHADER>) -> i32 {
+  unsafe {
+    DrawPolygon3DToShader(&va[0] as *const VERTEX3DSHADER, va.len() as i32 / 3)
+  }
 }
 
-pub fn draw_polygon_3d(va: &VERTEX3D, npolygons: i32,
-  gh: i32, trans: i32) -> i32 {
-  unsafe { DrawPolygon3D(va as *const VERTEX3D, npolygons, gh, trans) }
+pub fn draw_polygon_3d(va: &Vec<VERTEX3D>, gh: i32, trans: i32) -> i32 {
+  unsafe {
+    DrawPolygon3D(&va[0] as *const VERTEX3D, va.len() as i32 / 3, gh, trans)
+  }
 }
 
 pub fn init_font_to_handle() -> i32 {
