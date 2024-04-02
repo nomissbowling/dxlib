@@ -16,9 +16,6 @@ pub fn screen(p: &str) -> Result<(), Box<dyn Error>> {
   let vss = from_vec_vts_gl(&demo::gen_vec_vts_gl(),
     &POS::new(0.0, 0.0, 0.0, 1.0), 128.0, tex_mode);
 
-  assert_eq!(vert.len(), demo::VPF_Q);
-  assert_eq!(vss.len(), demo::NFACES_CUBE);
-
   let base = PathBuf::from(p);
   let res: Vec<String> = vec![
     "Fantasie_Impromptu_op66.mid\0",
@@ -164,7 +161,7 @@ pub fn screen(p: &str) -> Result<(), Box<dyn Error>> {
     draw_polygon_3d_to_shader(&vert);
     draw_polygon_3d_to_shader(&vgl);
     draw_polygon_3d_to_shader(&pgl);
-    for i in 0..demo::NFACES_CUBE {
+    for (i, vs) in vss.iter().enumerate() {
       if tex_mode {
         if i == 0 {
           gds.set_to_shader(0); // clipped rect of 2d screen
@@ -174,7 +171,7 @@ pub fn screen(p: &str) -> Result<(), Box<dyn Error>> {
       } else {
         twh.set_to_shader(0); // white texture (through vertex color)
       }
-      draw_polygon_3d_to_shader(&vss[i]);
+      draw_polygon_3d_to_shader(vs);
     }
 
     grp.draw_turn(320, 0, TRUE);

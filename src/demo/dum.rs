@@ -11,10 +11,6 @@ pub fn screen(p: &str) {
   let vss = from_vec_vts_gl(&vec_vts_gl,
     &POS::new(0.0, 0.0, 0.0, 1.0), 128.0, true);
 
-  assert_eq!(vert.len(), demo::VPF_Q);
-  assert_eq!(vec_vts_gl.len(), demo::NFACES_CUBE);
-  assert_eq!(vss.len(), demo::NFACES_CUBE);
-
   let base = PathBuf::from(p);
   let res: Vec<String> = vec![
     "Fantasie_Impromptu_op66.mid\0",
@@ -124,8 +120,8 @@ unsafe {
     // SetTransformToViewport(&mv as *const MATRIX);
 
     DrawPolygon3DToShader(&vert[0], vert.len() as i32 / 3);
-    for i in 0..demo::NFACES_CUBE {
-      DrawPolygon3DToShader(&vss[i][0], vss[i].len() as i32 / 3);
+    for vs in vss.iter() {
+      DrawPolygon3DToShader(&vs[0], vs.len() as i32 / 3);
     }
 
     ScreenFlip();

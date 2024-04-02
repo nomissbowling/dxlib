@@ -6,11 +6,6 @@ use crate::{dx::*, ext::*};
 pub mod dum;
 pub mod typ;
 
-pub const TPF_Q: i32 = 2; // triangles per quad
-pub const VPF_Q: usize = 3 * TPF_Q as usize; // vertices per face quad
-pub const VPF_VTS: usize = 4; // vertices per face of vts
-pub const NFACES_CUBE: usize = 6; // faces of cube
-
 /// square bended shape Z (not gl order)
 /// - result vert: Vec&lt;VERTEX3D&gt;
 pub fn gen_vert() -> Vec<VERTEX3DSHADER> {
