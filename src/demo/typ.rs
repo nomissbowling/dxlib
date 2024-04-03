@@ -17,6 +17,9 @@ pub fn screen(p: &str) -> Result<(), Box<dyn Error>> {
     &POS::new(128.0, 96.0, 96.0, 1.0), 64.0, false); // always vertex color
   let vss = from_vec_vts_gl(&demo::gen_vec_vts_gl(),
     &POS::new(0.0, 0.0, 0.0, 1.0), 128.0, tex_mode);
+  let c6f = from_vec_vts_gl(&demo::gen_c6f_gl(),
+    &POS::new(160.0, 160.0, -128.0, 1.0), 40.0, tex_mode)
+    .into_iter().flat_map(|v| v).collect(); // cube 6 faces on the one texture
 
   let base = PathBuf::from(p);
   let res: Vec<String> = vec![
@@ -31,7 +34,8 @@ pub fn screen(p: &str) -> Result<(), Box<dyn Error>> {
     "shader_GS.gso\0",
     "_font_32_u8_0000.dft\0", // pre convert by CreateDXFontData.exe
     "_img_256x256_16x64x64.png\0", // 12 scenes
-    "_img_64x64_64x8x8.png\0" // 64 scenes
+    "_img_64x64_64x8x8.png\0", // 64 scenes
+    "_img_256x256_6x64x64.png\0" // 6 faces on the one texture
   ].into_iter().map(|p|
     base.join(p).to_str().expect("str").to_string()).collect();
 
@@ -67,6 +71,7 @@ pub fn screen(p: &str) -> Result<(), Box<dyn Error>> {
   let blk = dx.load_div_graph(&res[11], 8, 1, 8, 8, 8, FALSE, 8, 0);
   // for b in blk.iter() { println!("blk: {:08x}", b.handle()); }
   let bls = dx.make_graphs_from_div_graph(&blk, TRUE, TRUE, FALSE); // shader
+  let t6f = dx.load_graph(&res[12]); // shader 6 faces on the one texture
   let gds = dx.make_graph(64, 64, FALSE); // empty for clipping
   let twh = dx.make_graph_color(64, 64, get_color(255, 255, 255),
     TRUE, TRUE, FALSE); // white texture (through vertex color)
@@ -188,6 +193,12 @@ pub fn screen(p: &str) -> Result<(), Box<dyn Error>> {
       }
       draw_polygon_3d_to_shader(vs);
     }
+    if tex_mode {
+      t6f.set_to_shader(0); // 6 faces on the one texture
+    } else {
+      twh.set_to_shader(0); // white texture (through vertex color)
+    }
+    draw_polygon_3d_to_shader(&c6f);
 
     grp.draw_turn(320, 0, TRUE);
     grp.draw_extend(0, 480 - 60, 80, 480, TRUE);

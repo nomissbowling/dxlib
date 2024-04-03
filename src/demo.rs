@@ -95,6 +95,24 @@ pub fn gen_vec_vts_gl() -> Vec<Vec<VT>> {
     }).collect::<Vec<_>>()).collect::<Vec<_>>()
 }
 
+/// cube square x 6 faces on the one texture (gl order)
+pub fn gen_c6f_gl() -> Vec<Vec<VT>> {
+  let uvs = [
+    [[0.25, 0.50], [0.50, 0.50], [0.50, 0.25], [0.25, 0.25]], // 5137
+    [[0.25, 0.75], [0.25, 1.00], [0.50, 1.00], [0.50, 0.75]], // 4620
+    [[0.50, 0.25], [0.50, 0.00], [0.25, 0.00], [0.25, 0.25]], // 3267
+    [[0.50, 0.50], [0.25, 0.50], [0.25, 0.75], [0.50, 0.75]], // 1540
+    [[0.00, 0.25], [0.00, 0.50], [0.25, 0.50], [0.25, 0.25]], // 6457
+    [[0.75, 0.75], [0.75, 0.50], [0.50, 0.50], [0.50, 0.75]]]; // 2310
+  let mut vec_vts = gen_vec_vts_gl();
+  for (j, f) in uvs.iter().enumerate() {
+    for (i, uv) in f.iter().enumerate() {
+      vec_vts[j][i].uv = UV::get(uv);
+    }
+  }
+  vec_vts
+}
+
 /// any face (gl order)
 pub fn gen_any_face() -> Vec<Vec<VT>> {
   [
