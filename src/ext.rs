@@ -81,3 +81,13 @@ pub fn from_vec_vts_gl(vec_vts: &Vec<Vec<VT>>,
   offset: &POS, scale: f32, tex: bool) -> Vec<Vec<VERTEX3DSHADER>> {
   vec_vts.iter().map(|v| from_vts_gl(v, offset, scale, tex)).collect()
 }
+
+/// set -Y to convert culling CCW(GL) to CW(DX) (front &lt;-&gt; back)
+/// - vts_gl 0 1 2 3 (1 2 0 2 3 0) to vss (0 3 2 0 2 1)
+/// - tex: true: texture color, false: vertex color
+/// - result vsss: Vec&lt;Vec&lt;Vec&lt;VERTEX3DSHADER&gt;&gt;&gt;
+pub fn from_vec_vec_vts_gl(vec_vec_vts: &Vec<Vec<Vec<VT>>>,
+  offset: &POS, scale: f32, tex: bool) -> Vec<Vec<Vec<VERTEX3DSHADER>>> {
+  vec_vec_vts.iter().map(|f| f.iter().map(|v|
+    from_vts_gl(v, offset, scale, tex)).collect()).collect()
+}
