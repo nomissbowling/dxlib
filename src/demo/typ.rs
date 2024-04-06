@@ -21,15 +21,16 @@ pub fn screen(p: &str) -> Result<(), Box<dyn Error>> {
     &POS::new(160.0, 160.0, -128.0, 1.0), 40.0, tex_mode)
     .into_iter().flat_map(|v| v).collect(); // cube 6 faces on the one texture
 
-  let icosa = from_vec_vts_gl(&demo::gen_icosahedron(),
+  let tf = false; // true: on the one texture, false: texture each face
+  let icosa = from_vec_vec_vts_gl(&demo::gen_icosahedron(tf),
     &POS::new(192.0, 32.0, -96.0, 1.0), 32.0, tex_mode);
-  let dodeca = from_vec_vec_vts_gl(&demo::gen_dodecahedron(),
+  let dodeca = from_vec_vec_vts_gl(&demo::gen_dodecahedron(tf),
     &POS::new(192.0, -80.0, -96.0, 1.0), 32.0, tex_mode);
-  let dodeca_center = from_vec_vec_vts_gl(&demo::gen_dodecahedron_center(),
+  let dodeca_center = from_vec_vec_vts_gl(&demo::gen_dodecahedron_center(tf),
     &POS::new(128.0, -80.0, -192.0, 1.0), 32.0, tex_mode);
-  let c60 = from_vec_vec_vts_gl(&demo::gen_c60(),
+  let c60 = from_vec_vec_vts_gl(&demo::gen_c60(tf),
     &POS::new(192.0, -192.0, -96.0, 1.0), 32.0, tex_mode);
-  let c60_center = from_vec_vec_vts_gl(&demo::gen_c60_center(),
+  let c60_center = from_vec_vec_vts_gl(&demo::gen_c60_center(tf),
     &POS::new(128.0, -192.0, -192.0, 1.0), 32.0, tex_mode);
 
   let base = PathBuf::from(p);
@@ -211,15 +212,7 @@ pub fn screen(p: &str) -> Result<(), Box<dyn Error>> {
     }
     draw_polygon_3d_to_shader(&c6f);
 
-    for (i, vs) in icosa.iter().enumerate() {
-      if tex_mode {
-        bls[i % bls.len()].set_to_shader(0); // transparent
-      } else {
-        twh.set_to_shader(0); // white texture (through vertex color)
-      }
-      draw_polygon_3d_to_shader(vs);
-    }
-    for p in [&dodeca, &dodeca_center, &c60, &c60_center] {
+    for p in [&icosa, &dodeca, &dodeca_center, &c60, &c60_center] {
       for (i, f) in p.iter().enumerate() {
         if tex_mode {
           bls[i % bls.len()].set_to_shader(0); // transparent
