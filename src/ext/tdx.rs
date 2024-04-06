@@ -369,6 +369,51 @@ pub fn draw_box(l: i32, t: i32, r: i32, b: i32, c: u32, fill: i32) -> i32 {
   unsafe { DrawBox(l, t, r, b, c, fill) }
 }
 
+/// (move)
+pub fn draw_pixel_3d(p: VECTOR, c: u32) -> i32 {
+  unsafe { DrawPixel3D(p, c) }
+}
+
+/// (move)
+pub fn draw_line_3d(s: VECTOR, e: VECTOR, c: u32) -> i32 {
+  unsafe { DrawLine3D(s, e, c) }
+}
+
+/// (move)
+pub fn draw_triangle_3d(p0: VECTOR, p1: VECTOR, p2: VECTOR,
+  c: u32, fill: i32) -> i32 {
+  unsafe { DrawTriangle3D(p0, p1, p2, c, fill) }
+}
+
+/// (move)
+pub fn draw_cube_3d(p0: VECTOR, p1: VECTOR,
+  dif: u32, spc: u32, fill: i32) -> i32 {
+  unsafe { DrawCube3D(p0, p1, dif, spc, fill) }
+}
+
+/// cube set as vec
+pub fn draw_cube_set_3d(ca: &Vec<CUBEDATA>, fill: i32) -> i32 {
+  unsafe { DrawCubeSet3D(&ca[0] as *const CUBEDATA, ca.len() as i32, fill) }
+}
+
+/// (move)
+pub fn draw_sphere_3d(c: VECTOR, r: f32, div_num: i32,
+  dif: u32, spc: u32, fill: i32) -> i32 {
+  unsafe { DrawSphere3D(c, r, div_num, dif, spc, fill) }
+}
+
+/// (move)
+pub fn draw_capsule_3d(p0: VECTOR, p1: VECTOR, r: f32, div_num: i32,
+  dif: u32, spc: u32, fill: i32) -> i32 {
+  unsafe { DrawCapsule3D(p0, p1, r, div_num, dif, spc, fill) }
+}
+
+/// (move)
+pub fn draw_cone_3d(top: VECTOR, bottom: VECTOR, r: f32, div_num: i32,
+  dif: u32, spc: u32, fill: i32) -> i32 {
+  unsafe { DrawCone3D(top, bottom, r, div_num, dif, spc, fill) }
+}
+
 pub fn set_window_style_mode(s: i32) -> i32 {
   unsafe { SetWindowStyleMode(s) }
 }

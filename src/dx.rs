@@ -31,6 +31,15 @@ use std::ffi::{c_void};
 
 #[derive(Debug, Clone)]
 #[repr(C)]
+pub struct CUBEDATA {
+  pub p0: VECTOR,
+  pub p1: VECTOR,
+  pub dif: COLOR_U8,
+  pub spc: COLOR_U8
+}
+
+#[derive(Debug, Clone)]
+#[repr(C)]
 pub struct VECTOR {
   pub x: f32,
   pub y: f32,
@@ -364,6 +373,20 @@ extern "stdcall" {
   pub fn GetColor(r: i32, g: i32, b: i32) -> u32;
   pub fn DrawPixel(x: i32, y: i32, c: u32) -> i32;
   pub fn DrawBox(l: i32, t: i32, r: i32, b: i32, c: u32, fill: i32) -> i32;
+
+  pub fn DrawPixel3D(p: VECTOR, c: u32) -> i32;
+  pub fn DrawLine3D(s: VECTOR, e: VECTOR, c: u32) -> i32;
+  pub fn DrawTriangle3D(p0: VECTOR, p1: VECTOR, p2: VECTOR,
+    c: u32, fill: i32) -> i32;
+  pub fn DrawCube3D(p0: VECTOR, p1: VECTOR,
+    dif: u32, spc: u32, fill: i32) -> i32;
+  pub fn DrawCubeSet3D(cube_array: *const CUBEDATA, n: i32, fill: i32) -> i32;
+  pub fn DrawSphere3D(c: VECTOR, r: f32, div_num: i32,
+    dif: u32, spc: u32, fill: i32) -> i32;
+  pub fn DrawCapsule3D(p0: VECTOR, p1: VECTOR, r: f32, div_num: i32,
+    dif: u32, spc: u32, fill: i32) -> i32;
+  pub fn DrawCone3D(top: VECTOR, bottom: VECTOR, r: f32, div_num: i32,
+    dif: u32, spc: u32, fill: i32) -> i32;
 
   /// private
   /// - [https://densanken.com/wiki/index.php?dx%A5%E9%A5%A4%A5%D6%A5%E9%A5%EA%B1%A3%A4%B7%B4%D8%BF%F4%A4%CE%A5%DA%A1%BC%A5%B8](https://densanken.com/wiki/index.php?dx%A5%E9%A5%A4%A5%D6%A5%E9%A5%EA%B1%A3%A4%B7%B4%D8%BF%F4%A4%CE%A5%DA%A1%BC%A5%B8)

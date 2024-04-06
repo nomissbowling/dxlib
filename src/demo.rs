@@ -160,20 +160,20 @@ pub fn f_to_f64<F: Float>(v: &[F]) -> Vec<f64> {
 
 /// vtx to vt
 pub fn gen_vt<F: Float>(ph: &impl TUV<F>, i: usize, tf: bool,
-  fi: usize, n: usize, vi: usize, ii: usize) -> VT {
+  fi: usize, n: usize, vi: usize, ii: usize, c: bool) -> VT {
   let p = f_to_f32(&ph.ref_vtx()[i]);
   let uv = f_to_f32(&match tf {
-    true => ph.get_uv_t(fi, vi, ii), // on the one texture
-    false => ph.get_uv_f(vi, n)}); // texture each face
+  true => ph.get_uv_t(fi, vi, ii), // on the one texture
+  false => ph.get_uv_f(n, vi, ii, c)}); // texture each face
   VT::get(&[p[0], p[1], p[2], 1.0], &[uv[0], uv[1]])
 }
 
 /// polyhedron faces by Vec N of Vec P(polygon) indexed triangles (gl order)
-pub fn phf<F: Float>(ph: &impl TUV<F>, tf: bool) -> Vec<Vec<Vec<VT>>> {
+pub fn phf<F: Float>(ph: &impl TUV<F>, tf: bool, c: bool) -> Vec<Vec<Vec<VT>>> {
   ph.ref_tri().iter().enumerate().map(|(fi, f)|
     f.iter().enumerate().map(|(vi, v)|
       v.iter().enumerate().map(|(ii, &i)| {
-        gen_vt(ph, i as usize, tf, fi, f.len(), vi, ii)
+        gen_vt(ph, i as usize, tf, fi, f.len(), vi, ii, c)
       }).collect()
     ).collect()
   ).collect()
@@ -181,25 +181,25 @@ pub fn phf<F: Float>(ph: &impl TUV<F>, tf: bool) -> Vec<Vec<Vec<VT>>> {
 
 /// icosahedron (gl order)
 pub fn gen_icosahedron(tf: bool) -> Vec<Vec<Vec<VT>>> {
-  phf(&Icosahedron::new(1.0f32), tf)
+  phf(&Icosahedron::new(1.0f32), tf, false)
 }
 
 /// dodecahedron (gl order)
 pub fn gen_dodecahedron(tf: bool) -> Vec<Vec<Vec<VT>>> {
-  phf(&Dodecahedron::new(1.0f32), tf)
+  phf(&Dodecahedron::new(1.0f32), tf, false)
 }
 
 /// dodecahedron center (gl order)
 pub fn gen_dodecahedron_center(tf: bool) -> Vec<Vec<Vec<VT>>> {
-  phf(&DodecahedronCenter::new(1.0f32), tf)
+  phf(&DodecahedronCenter::new(1.0f32), tf, true)
 }
 
 /// c60 (gl order)
 pub fn gen_c60(tf: bool) -> Vec<Vec<Vec<VT>>> {
-  phf(&C60::new(1.0f32), tf)
+  phf(&C60::new(1.0f32), tf, false)
 }
 
 /// c60 center (gl order)
 pub fn gen_c60_center(tf: bool) -> Vec<Vec<Vec<VT>>> {
-  phf(&C60Center::new(1.0f32), tf)
+  phf(&C60Center::new(1.0f32), tf, true)
 }
