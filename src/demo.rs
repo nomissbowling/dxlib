@@ -161,10 +161,13 @@ pub fn f_to_f64<F: Float>(v: &[F]) -> Vec<f64> {
 /// vtx to vt
 pub fn gen_vt<F: Float>(ph: &impl TUV<F>, i: usize, tf: bool,
   fi: usize, n: usize, vi: usize, ii: usize, c: bool) -> VT {
+  let r = std::f64::consts::PI / 2.0; // rot
+  let s = 1.0f64; // scale
+  let o = [0.0f64, 0.0f64]; // offset
   let p = f_to_f32(&ph.ref_vtx()[i]);
   let uv = f_to_f32(&match tf {
-  true => ph.get_uv_t(fi, vi, ii), // on the one texture
-  false => ph.get_uv_f(n, vi, ii, c)}); // texture each face
+  true => ph.get_uv_t(fi, vi, ii, 0.0f64, s, o), // on the one texture
+  false => ph.get_uv_f(n, vi, ii, c, r, s, o)}); // texture each face
   VT::get(&[p[0], p[1], p[2], 1.0], &[uv[0], uv[1]])
 }
 
