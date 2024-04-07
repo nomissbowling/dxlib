@@ -242,17 +242,18 @@ pub fn screen(p: &str) -> Result<(), Box<dyn Error>> {
       }
     }
 
+    let ff = if wf { 0 } else { 1 }; // fill flag
     draw_cone_3d(
       VECTOR::new(-192.0, 0.0, -16.0), VECTOR::new(-255.0, 0.0, -16.0),
-      32.0, 16, col[3], col[4], 1);
+      32.0, 16, col[3], col[4], ff);
     draw_capsule_3d(
       VECTOR::new(-192.0, -64.0, -16.0), VECTOR::new(-255.0, -64.0, -16.0),
-      32.0, 16, col[3], col[4], 1);
+      32.0, 16, col[3], col[4], ff);
     draw_sphere_3d(
-      VECTOR::new(-192.0, -128.0, -16.0), 32.0, 16, col[3], col[4], 1);
+      VECTOR::new(-192.0, -128.0, -16.0), 32.0, 16, col[3], col[4], ff);
     draw_cube_3d(
       VECTOR::new(-255.0, -224.0, -48.0), VECTOR::new(-192.0, -160.0, 16.0),
-      col[3], col[4], 1);
+      col[3], col[4], ff);
     let ca = (0..3).into_iter().flat_map(|k|
       (0..3).into_iter().flat_map(|j|
         (0..3).into_iter().map(|i| {
@@ -266,7 +267,7 @@ pub fn screen(p: &str) -> Result<(), Box<dyn Error>> {
             dif: COLOR_U8::from_u32(col[3]),
             spc: COLOR_U8::from_u32(col[4])}
         }).collect::<Vec<_>>()).collect::<Vec<_>>()).collect::<Vec<_>>();
-    draw_cube_set_3d(&ca, 1);
+    draw_cube_set_3d(&ca, ff);
 
     grp.draw_turn(320, 0, TRUE);
     grp.draw_extend(0, 480 - 60, 80, 480, TRUE);
