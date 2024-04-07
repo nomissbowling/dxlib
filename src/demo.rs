@@ -6,7 +6,7 @@ use crate::{dx::*, ext::*};
 use fullerene::c60::{C60, C60Center};
 use fullerene::dodecahedron::{Dodecahedron, DodecahedronCenter};
 use fullerene::icosahedron::Icosahedron;
-use fullerene::TUV;
+use fullerene::{PHF, TUV, f_to_f32}; // f_to_f64
 use num::Float;
 
 pub mod dum;
@@ -148,35 +148,14 @@ pub fn gen_any_face() -> Vec<Vec<VT>> {
       VT::get(&t.0, &t.1)).collect::<Vec<_>>()).collect::<Vec<_>>()
 }
 
-/// f_to_f32
-pub fn f_to_f32<F: Float>(v: &[F]) -> Vec<f32> {
-  v.iter().map(|i| i.to_f32().unwrap()).collect()
-}
-
-/// f_to_f64
-pub fn f_to_f64<F: Float>(v: &[F]) -> Vec<f64> {
-  v.iter().map(|i| i.to_f64().unwrap()).collect()
-}
-
-/// vtx to vt
-pub fn gen_vt<F: Float>(ph: &impl TUV<F>, i: usize, tf: bool,
-  fi: usize, n: usize, vi: usize, ii: usize, c: bool) -> VT {
-  let r = std::f64::consts::PI / 2.0; // rot
-  let s = 1.0f64; // scale
-  let o = [0.0f64, 0.0f64]; // offset
-  let p = f_to_f32(&ph.ref_vtx()[i]);
-  let uv = f_to_f32(&match tf {
-  true => ph.get_uv_t(fi, vi, ii, 0.0f64, s, o), // on the one texture
-  false => ph.get_uv_f(n, vi, ii, c, r, s, o)}); // texture each face
-  VT::get(&[p[0], p[1], p[2], 1.0], &[uv[0], uv[1]])
-}
-
-/// polyhedron faces by Vec N of Vec P(polygon) indexed triangles (gl order)
-pub fn phf<F: Float>(ph: &impl TUV<F>, tf: bool, c: bool) -> Vec<Vec<Vec<VT>>> {
-  ph.ref_tri().iter().enumerate().map(|(fi, f)|
-    f.iter().enumerate().map(|(vi, v)|
-      v.iter().enumerate().map(|(ii, &i)| {
-        gen_vt(ph, i as usize, tf, fi, f.len(), vi, ii, c)
+/// phf to vt (polyhedron faces by Vec N of Vec P indexed triangles) (gl order)
+pub fn gen_vt<F: Float>(phf: PHF<F>) -> Vec<Vec<Vec<VT>>> {
+  phf.iter().map(|f|
+    f.iter().map(|v|
+      v.iter().map(|(p, uv)| {
+        let p = f_to_f32(p);
+        let uv = f_to_f32(uv);
+        VT::get(&[p[0], p[1], p[2], 1.0], &[uv[0], uv[1]])
       }).collect()
     ).collect()
   ).collect()
@@ -184,25 +163,25 @@ pub fn phf<F: Float>(ph: &impl TUV<F>, tf: bool, c: bool) -> Vec<Vec<Vec<VT>>> {
 
 /// icosahedron (gl order)
 pub fn gen_icosahedron(tf: bool) -> Vec<Vec<Vec<VT>>> {
-  phf(&Icosahedron::new(1.0f32), tf, false)
+  gen_vt(Icosahedron::new(1.0f32).with_uv(tf))
 }
 
 /// dodecahedron (gl order)
 pub fn gen_dodecahedron(tf: bool) -> Vec<Vec<Vec<VT>>> {
-  phf(&Dodecahedron::new(1.0f32), tf, false)
+  gen_vt(Dodecahedron::new(1.0f32).with_uv(tf))
 }
 
 /// dodecahedron center (gl order)
 pub fn gen_dodecahedron_center(tf: bool) -> Vec<Vec<Vec<VT>>> {
-  phf(&DodecahedronCenter::new(1.0f32), tf, true)
+  gen_vt(DodecahedronCenter::new(1.0f32).with_uv(tf))
 }
 
 /// c60 (gl order)
 pub fn gen_c60(tf: bool) -> Vec<Vec<Vec<VT>>> {
-  phf(&C60::new(1.0f32), tf, false)
+  gen_vt(C60::new(1.0f32).with_uv(tf))
 }
 
 /// c60 center (gl order)
 pub fn gen_c60_center(tf: bool) -> Vec<Vec<Vec<VT>>> {
-  phf(&C60Center::new(1.0f32), tf, true)
+  gen_vt(C60Center::new(1.0f32).with_uv(tf))
 }
