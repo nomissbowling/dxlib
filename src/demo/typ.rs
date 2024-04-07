@@ -7,6 +7,7 @@ use std::path::PathBuf;
 use crate::{dx::*, ext::*, ext::tdx::*, demo};
 
 pub fn screen(p: &str) -> Result<(), Box<dyn Error>> {
+  let wf = false; // true: wire frame, false: surface
   let tex_mode = true; // true: texture color, false: vertex color
   let vert = demo::gen_vert();
   let vgl = from_vts_gl(&demo::gen_vert_gl(),
@@ -177,21 +178,37 @@ pub fn screen(p: &str) -> Result<(), Box<dyn Error>> {
     // create_viewport_matrix(&mut mv, cx, cy, w, h);
     // set_transform_to_viewport(&mv);
 
+    let col = [
+      get_color(0, 0, 0),
+      get_color(255, 0, 0),
+      get_color(0, 255, 0),
+      get_color(255, 255, 0),
+      get_color(0, 0, 255),
+      get_color(255, 0, 255),
+      get_color(0, 255, 255),
+      get_color(255, 255, 255)];
+    draw_line_3d(VECTOR::zeros(), VECTOR::new(-512.0, 0.0, 0.0), col[7]);
+    draw_line_3d(VECTOR::zeros(), VECTOR::new(0.0, -512.0, 0.0), col[7]);
+    draw_line_3d(VECTOR::zeros(), VECTOR::new(0.0, 0.0, -512.0), col[7]);
+    draw_line_3d(VECTOR::zeros(), VECTOR::new(512.0, 0.0, 0.0), col[1]);
+    draw_line_3d(VECTOR::zeros(), VECTOR::new(0.0, 512.0, 0.0), col[2]);
+    draw_line_3d(VECTOR::zeros(), VECTOR::new(0.0, 0.0, 512.0), col[4]);
+
     if tex_mode {
       gds.set_to_shader(0); // clipped rect of 2d screen
     } else {
       twh.set_to_shader(0); // white texture (through vertex color)
     }
-    draw_polygon_3d_to_shader(&vert);
-    draw_polygon_3d_to_shader(&vgl);
-    draw_polygon_3d_to_shader(&pgl);
+    draw_polygon_3d_to_shader_or_wire(&vert, wf);
+    draw_polygon_3d_to_shader_or_wire(&vgl, wf);
+    draw_polygon_3d_to_shader_or_wire(&pgl, wf);
     for (i, vs) in agl.iter().enumerate() {
       if (tex_mode && i == agl.len() - 1) || tick & 0x00000080 != 0 {
         gds.set_to_shader(0); // clipped rect of 2d screen
       } else {
         twh.set_to_shader(0); // white texture (through vertex color)
       }
-      draw_polygon_3d_to_shader(vs);
+      draw_polygon_3d_to_shader_or_wire(vs, wf);
     }
     for (i, vs) in vss.iter().enumerate() {
       if tex_mode {
@@ -203,14 +220,14 @@ pub fn screen(p: &str) -> Result<(), Box<dyn Error>> {
       } else {
         twh.set_to_shader(0); // white texture (through vertex color)
       }
-      draw_polygon_3d_to_shader(vs);
+      draw_polygon_3d_to_shader_or_wire(vs, wf);
     }
     if tex_mode {
       t6f.set_to_shader(0); // 6 faces on the one texture
     } else {
       twh.set_to_shader(0); // white texture (through vertex color)
     }
-    draw_polygon_3d_to_shader(&c6f);
+    draw_polygon_3d_to_shader_or_wire(&c6f, wf);
 
     for p in [&icosa, &dodeca, &dodeca_center, &c60, &c60_center] {
       for (i, f) in p.iter().enumerate() {
@@ -220,10 +237,36 @@ pub fn screen(p: &str) -> Result<(), Box<dyn Error>> {
           twh.set_to_shader(0); // white texture (through vertex color)
         }
         for vs in f.iter() {
-          draw_polygon_3d_to_shader(vs);
+          draw_polygon_3d_to_shader_or_wire(vs, wf);
         }
       }
     }
+
+    draw_cone_3d(
+      VECTOR::new(-192.0, 0.0, -16.0), VECTOR::new(-255.0, 0.0, -16.0),
+      32.0, 16, col[3], col[4], 1);
+    draw_capsule_3d(
+      VECTOR::new(-192.0, -64.0, -16.0), VECTOR::new(-255.0, -64.0, -16.0),
+      32.0, 16, col[3], col[4], 1);
+    draw_sphere_3d(
+      VECTOR::new(-192.0, -128.0, -16.0), 32.0, 16, col[3], col[4], 1);
+    draw_cube_3d(
+      VECTOR::new(-255.0, -224.0, -48.0), VECTOR::new(-192.0, -160.0, 16.0),
+      col[3], col[4], 1);
+    let ca = (0..3).into_iter().flat_map(|k|
+      (0..3).into_iter().flat_map(|j|
+        (0..3).into_iter().map(|i| {
+          let r = 8.0;
+          let x = -160.0 - i as f32 * r * 3.0;
+          let y = -256.0 - j as f32 * r * 3.0;
+          let z = 16.0 - k as f32 * r * 3.0;
+          CUBEDATA{
+            p0: VECTOR::new(x - r, y - r, z - r),
+            p1: VECTOR::new(x + r, y + r, z + r),
+            dif: COLOR_U8::from_u32(col[3]),
+            spc: COLOR_U8::from_u32(col[4])}
+        }).collect::<Vec<_>>()).collect::<Vec<_>>()).collect::<Vec<_>>();
+    draw_cube_set_3d(&ca, 1);
 
     grp.draw_turn(320, 0, TRUE);
     grp.draw_extend(0, 480 - 60, 80, 480, TRUE);

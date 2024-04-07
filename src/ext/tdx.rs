@@ -341,6 +341,22 @@ pub fn set_transform_to_viewport(m: &MATRIX) -> i32 {
   unsafe { SetTransformToViewport(m as *const MATRIX) }
 }
 
+pub fn draw_polygon_3d_to_shader_or_wire(va: &Vec<VERTEX3DSHADER>,
+  wf: bool) -> i32 {
+  match wf {
+  true => {
+    let c = get_color(240, 192, 32);
+    for i in 0..(va.len() / 3) {
+      let p = (0..3).into_iter().map(|k|
+        &va[i * 3 + k].pos).collect::<Vec<_>>();
+      draw_triangle_3d(p[0].clone(), p[1].clone(), p[2].clone(), c, 0);
+    }
+    0
+  },
+  false => draw_polygon_3d_to_shader(va)
+  }
+}
+
 pub fn draw_polygon_3d_to_shader(va: &Vec<VERTEX3DSHADER>) -> i32 {
   unsafe {
     DrawPolygon3DToShader(&va[0] as *const VERTEX3DSHADER, va.len() as i32 / 3)
