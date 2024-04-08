@@ -157,6 +157,15 @@ pub fn screen(p: &str) -> Result<(), Box<dyn Error>> {
       get_color(255, 255, 255)];
     set_global_ambient_light(COLOR_F::from_u32(col[5]));
     set_use_light_angle_attenuation(TRUE); // default TRUE
+    set_light_enable(TRUE); // default TRUE
+    set_light_dif_color(COLOR_F::from_u32(col[7]));
+    set_light_spc_color(COLOR_F::from_u32(col[7]));
+    set_light_amb_color(COLOR_F::get(&[0.33, 0.33, 0.33, 0.33]));
+    set_light_direction(VECTOR::get(&[1.0, -1.0, 1.0]));
+    // set_light_position(VECTOR::get(&[-1.0, 1.0, -1.0])); // not direction
+    // set_light_range_atten(1000.0, 1.0, 0.5, 0.25);
+    // set_light_angle(2.0 * pi / 3.0, pi / 2.0);
+    // set_light_use_shadow_map(ssi, TRUE);
     set_use_back_culling(TRUE); // small true is not same as 1 or TRUE
     // tex.set_to_shader(0); // single texture
     // [&grp, &tex][anim % 2].set_to_shader(0); // changing texture

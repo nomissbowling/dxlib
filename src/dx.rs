@@ -331,8 +331,18 @@ extern "stdcall" {
   pub fn SetMaterialParam(mp: MATERIALPARAM) -> i32;
   pub fn SetUseLighting(flg: i32) -> i32; // default TRUE
   pub fn SetUseSpecular(flg: i32) -> i32; // default TRUE
-  pub fn SetGlobalAmbientLight(c: COLOR_F) -> i32;
+  pub fn SetGlobalAmbientLight(c: COLOR_F) -> i32; // 0 0 0 0 or .2 .2 .2 .2
   pub fn SetUseLightAngleAttenuation(flg: i32) -> i32; // default TRUE
+
+  pub fn SetLightEnable(flg: i32) -> i32; // default TRUE
+  pub fn SetLightDifColor(c: COLOR_F) -> i32; // 1 1 1 1
+  pub fn SetLightSpcColor(c: COLOR_F) -> i32; // 1 1 1 1 or .5 .5 .5 .5
+  pub fn SetLightAmbColor(c: COLOR_F) -> i32; // .33 .33 .33 .33
+  pub fn SetLightDirection(d: VECTOR) -> i32; // 1 -1 1 (variable)
+  pub fn SetLightPosition(p: VECTOR) -> i32; // no effect to directional light
+  pub fn SetLightRangeAtten(rng: f32, a0: f32, a1: f32, a2: f32) -> i32;
+  pub fn SetLightAngle(oa: f32, ia: f32) -> i32; // oa 0-DX_PI_F ia 0-oa
+  pub fn SetLightUseShadowMap(ssi: i32, flg: i32) -> i32;
 
   pub fn SetUseBackCulling(flg: i32) -> i32;
   pub fn SetRenderTargetToShader(target_index: i32, draw_screen: i32,

@@ -277,6 +277,50 @@ pub fn set_use_light_angle_attenuation(flg: i32) -> i32 {
   unsafe { SetUseLightAngleAttenuation(flg) }
 }
 
+/// default TRUE
+pub fn set_light_enable(flg: i32) -> i32 {
+  unsafe { SetLightEnable(flg) }
+}
+
+/// (move) default 1 1 1 1
+pub fn set_light_dif_color(c: COLOR_F) -> i32 {
+  unsafe { SetLightDifColor(c) }
+}
+
+/// (move) default 1 1 1 1 or .5 .5 .5 .5
+pub fn set_light_spc_color(c: COLOR_F) -> i32 {
+  unsafe { SetLightSpcColor(c) }
+}
+
+/// (move) default .33 .33 .33 .33
+pub fn set_light_amb_color(c: COLOR_F) -> i32 {
+  unsafe { SetLightAmbColor(c) }
+}
+
+/// (move) default 1 -1 1 (variable)
+pub fn set_light_direction(d: VECTOR) -> i32 {
+  unsafe { SetLightDirection(d) }
+}
+
+/// (move) no effect to directional light
+pub fn set_light_position(p: VECTOR) -> i32 {
+  unsafe { SetLightPosition(p) }
+}
+
+/// attenuation distance 100.0 / (a0 + a1 * d + a2 * d * d) when d &lt;= rng
+pub fn set_light_range_atten(rng: f32, a0: f32, a1: f32, a2: f32) -> i32 {
+  unsafe { SetLightRangeAtten(rng, a0, a1, a2) }
+}
+
+/// oa 0-DX_PI_F ia 0-oa
+pub fn set_light_angle(oa: f32, ia: f32) -> i32 {
+  unsafe { SetLightAngle(oa, ia) }
+}
+
+pub fn set_light_use_shadow_map(ssi: i32, flg: i32) -> i32 {
+  unsafe { SetLightUseShadowMap(ssi, flg) }
+}
+
 pub fn set_use_back_culling(f: i32) -> i32 {
   unsafe { SetUseBackCulling(f) }
 }
