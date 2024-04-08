@@ -11,13 +11,10 @@ struct VS_INPUT {
   float2 texCoords1 : TEXCOORD1; // sub texture UV (FLOAT su, FLOAT sv) (skip)
 };
 
-struct VS_OUTPUT { // to Pixel Shader
-  float2 texCoords0 : TEXCOORD0; // through
-  float4 dif : COLOR0; // through
-  float4 spc : COLOR1; // through
-  float3 norm : NORMAL0; // through
-  float3 pos : POSITION0; // through
-  float4 ppos : SV_POSITION; // pos in projection
+struct VS_OUTPUT {
+  float4 dif : COLOR0; // to Pixel Shader
+  float2 texCoords0 : TEXCOORD0; // to Pixel Shader
+  float4 pos : SV_POSITION; // pos in projection
 };
 
 struct DX_D3D11_VS_CONST_BUFFER_BASE {
@@ -63,15 +60,12 @@ VS_OUTPUT main(VS_INPUT vsi)
   viewPosition.z = dot(worldPosition, g_Base.ViewMatrix[2]);
   viewPosition.w = 1.0f;
   // view -> projection
-  vso.ppos.x = dot(viewPosition, g_Base.ProjectionMatrix[0]);
-  vso.ppos.y = dot(viewPosition, g_Base.ProjectionMatrix[1]);
-  vso.ppos.z = dot(viewPosition, g_Base.ProjectionMatrix[2]);
-  vso.ppos.w = dot(viewPosition, g_Base.ProjectionMatrix[3]);
+  vso.pos.x = dot(viewPosition, g_Base.ProjectionMatrix[0]);
+  vso.pos.y = dot(viewPosition, g_Base.ProjectionMatrix[1]);
+  vso.pos.z = dot(viewPosition, g_Base.ProjectionMatrix[2]);
+  vso.pos.w = dot(viewPosition, g_Base.ProjectionMatrix[3]);
   // through parameters
   vso.texCoords0 = vsi.texCoords0;
   vso.dif = vsi.dif;
-  vso.spc = vsi.spc;
-  vso.norm = vsi.norm;
-  vso.pos = vsi.pos;
   return vso;
 }

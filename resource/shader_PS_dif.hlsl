@@ -1,11 +1,7 @@
 // Pixel Shader
-struct PS_INPUT { // from Vertex Shader
-  float2 texCoords0 : TEXCOORD0; // through
-  float4 dif : COLOR0; // through
-  float4 spc : COLOR1; // through
-  float3 norm : NORMAL0; // through
-  float3 pos : POSITION0; // through
-  float4 ppos : SV_POSITION; // pos in projection
+struct PS_INPUT {
+  float4 dif : COLOR0; // from Vertex Shader
+  float2 texCoords0 : TEXCOORD0; // from Vertex Shader
 };
 
 struct PS_OUTPUT {
@@ -28,8 +24,6 @@ cbuffer cbD3D11_CONST_BUFFER_PS_BASE : register(b1) {
 
 SamplerState g_DiffuseMapSampler : register(s0);
 Texture2D g_DiffuseMapTexture : register(t0);
-// g_vecLight : register(c14); // float4
-// g_EyePos : register(c32); // float4
 
 PS_OUTPUT main(PS_INPUT psi)
 {
