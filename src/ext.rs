@@ -65,7 +65,8 @@ pub fn from_vts_gl(vts: &Vec<VT>, offset: &POS, scale: f32, tex: bool) ->
     // (all white and alpha max when use texture)
     let dif = if tex { COLOR_U8::new(255, 255, 255, 255) } // diffuse
       else { COLOR_U8::from_float4(&vts[k].pos) };
-    let spc = COLOR_U8::zeros(); // specular
+    let spc = if tex { COLOR_U8::get(&[0, 0, 255, 255]) } // specular
+      else { COLOR_U8::new(255, 255, 255, 255) };
     let uv = vts[k].uv.clone(); // texture UV
     let suv = FLOAT2::zeros();
     vs.push(VERTEX3DSHADER{pos, spos, norm, tan, binorm, dif, spc, uv, suv});
