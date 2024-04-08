@@ -102,6 +102,9 @@ impl COLOR_F {
       if i < 3 { (c + 2.0) / 4.0 } else { 1.0 }).collect::<Vec<_>>();
     COLOR_F::new(v[0], v[1], v[2], v[3])
   }
+  pub fn from_u32(u: u32) -> Self {
+    COLOR_F::from_u8(&COLOR_U8::from_u32(u))
+  }
 }
 
 #[derive(Debug, Clone, PartialEq)]
@@ -327,6 +330,9 @@ extern "stdcall" {
   pub fn SetMaterialUseVertSpcColor(flg: i32) -> i32; // default TRUE
   pub fn SetMaterialParam(mp: MATERIALPARAM) -> i32;
   pub fn SetUseLighting(flg: i32) -> i32; // default TRUE
+  pub fn SetUseSpecular(flg: i32) -> i32; // default TRUE
+  pub fn SetGlobalAmbientLight(c: COLOR_F) -> i32;
+  pub fn SetUseLightAngleAttenuation(flg: i32) -> i32; // default TRUE
 
   pub fn SetUseBackCulling(flg: i32) -> i32;
   pub fn SetRenderTargetToShader(target_index: i32, draw_screen: i32,

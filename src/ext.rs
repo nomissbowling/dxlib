@@ -59,7 +59,15 @@ pub fn from_vts_gl(vts: &Vec<VT>, offset: &POS, scale: f32, tex: bool) ->
       offset.z + vts[k].pos.z * scale];
     let pos = VECTOR::get(&p); // shape <> CW + CW
     let spos = FLOAT4::zeros();
-    let norm = VECTOR::zeros();
+    let v = [vts[k].pos.x, vts[k].pos.y, vts[k].pos.z];
+/*
+    // calc norm
+    let mut d = v.iter().map(|&p| p * p).sum::<f32>();
+    if d < 0.000001 { d = 1.0 };
+    let norm = VECTOR::get(&[v[0] / d, v[1] / d, v[2] / d]);
+*/
+    // set norm through v and auto calc normalize(norm) later by HLSL
+    let norm = VECTOR::get(&v);
     let tan = VECTOR::zeros();
     let binorm = VECTOR::zeros();
     // (all white and alpha max when use texture)

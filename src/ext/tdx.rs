@@ -257,8 +257,24 @@ pub fn set_material_param(mp: MATERIALPARAM) -> i32 {
   unsafe { SetMaterialParam(mp) }
 }
 
+/// default TRUE
 pub fn set_use_lighting(flg: i32) -> i32 {
   unsafe { SetUseLighting(flg) }
+}
+
+/// default TRUE
+pub fn set_use_specular(flg: i32) -> i32 {
+  unsafe { SetUseSpecular(flg) }
+}
+
+/// (move)
+pub fn set_global_ambient_light(c: COLOR_F) -> i32 {
+  unsafe { SetGlobalAmbientLight(c) }
+}
+
+/// default TRUE
+pub fn set_use_light_angle_attenuation(flg: i32) -> i32 {
+  unsafe { SetUseLightAngleAttenuation(flg) }
 }
 
 pub fn set_use_back_culling(f: i32) -> i32 {

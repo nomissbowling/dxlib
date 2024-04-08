@@ -144,6 +144,19 @@ pub fn screen(p: &str) -> Result<(), Box<dyn Error>> {
     dx.unreg(Box::new(g));
 
     set_draw_screen(DX_SCREEN_WORK);
+    set_use_lighting(TRUE); // default TRUE
+    set_use_specular(TRUE); // default TRUE
+    let col = [
+      get_color(0, 0, 0),
+      get_color(255, 0, 0),
+      get_color(0, 255, 0),
+      get_color(255, 255, 0),
+      get_color(0, 0, 255),
+      get_color(255, 0, 255),
+      get_color(0, 255, 255),
+      get_color(255, 255, 255)];
+    set_global_ambient_light(COLOR_F::from_u32(col[5]));
+    set_use_light_angle_attenuation(TRUE); // default TRUE
     set_use_back_culling(TRUE); // small true is not same as 1 or TRUE
     // tex.set_to_shader(0); // single texture
     // [&grp, &tex][anim % 2].set_to_shader(0); // changing texture
@@ -178,15 +191,6 @@ pub fn screen(p: &str) -> Result<(), Box<dyn Error>> {
     // create_viewport_matrix(&mut mv, cx, cy, w, h);
     // set_transform_to_viewport(&mv);
 
-    let col = [
-      get_color(0, 0, 0),
-      get_color(255, 0, 0),
-      get_color(0, 255, 0),
-      get_color(255, 255, 0),
-      get_color(0, 0, 255),
-      get_color(255, 0, 255),
-      get_color(0, 255, 255),
-      get_color(255, 255, 255)];
     draw_line_3d(VECTOR::zeros(), VECTOR::new(-512.0, 0.0, 0.0), col[7]);
     draw_line_3d(VECTOR::zeros(), VECTOR::new(0.0, -512.0, 0.0), col[7]);
     draw_line_3d(VECTOR::zeros(), VECTOR::new(0.0, 0.0, -512.0), col[7]);
