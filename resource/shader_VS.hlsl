@@ -62,12 +62,17 @@ cbuffer cbD3D11_CONST_BUFFER_VS_LOCALWORLDMATRIX : register(b3) {
   DX_D3D11_VS_CONST_BUFFER_LOCALWORLDMATRIX g_LocalWorldMatrix;
 };
 
+cbuffer cb_Test : register(b4) {
 float4 g_Test = float4(1.1, 2.2, 3.3, 4.4);
 float4 g_Arr[4] = {
   float4(0.1, 0.2, 0.3, 0.4),
   float4(0.2, 0.3, 0.4, 0.5),
   float4(0.3, 0.4, 0.5, 0.6),
   float4(0.4, 0.5, 0.6, 0.7)};
+};
+
+float4 g_Reg0 : register(c0);
+float4 g_Reg1 : register(c1);
 
 VS_OUTPUT main(VS_INPUT vsi)
 {

@@ -185,9 +185,9 @@ pub fn screen(p: &str) -> Result<(), Box<dyn Error>> {
     // shg.set_shader();
 
     if tick == 0 {
-      proc_sh(&shv, &["g_Test\0", "g_Arr\0",
+      proc_sh(&shv, &["g_Reg0\0", "g_Reg1\0", "g_Test\0", "g_Arr\0",
         "g_Common\0", "g_Base\0", "g_OtherMatrix\0", "g_LocalWorldMatrix\0"]);
-      proc_sh(&shp, &["g_Test\0", "g_Arr\0",
+      proc_sh(&shp, &["g_Reg0\0", "g_Reg1\0", "g_Test\0", "g_Arr\0",
         "g_Common\0", "g_Base\0", "g_ShadowMap\0"]);
     }
     // set_ps_const_f(VecL0, COLOR_F::get(&[1.0, 1.0, 1.0, 1.0]).as_float4());

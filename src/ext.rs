@@ -37,6 +37,28 @@ impl VT {
   }
 }
 
+/// calc norm or auto calc normalize(norm) later by HLSL
+pub fn calc_norm(vs: &mut Vec<VERTEX3DSHADER>) {
+  let npolys = vs.len() / 3;
+  for f in 0..npolys {
+    let t = (0..3).into_iter().map(|k| &vs[f * 3 + k].pos).collect::<Vec<_>>();
+    let a = VECTOR::new(t[2].x - t[1].x, t[2].y - t[1].y, t[2].z - t[1].z);
+    let b = VECTOR::new(t[1].x - t[0].x, t[1].y - t[0].y, t[1].z - t[0].z);
+    let v = [
+      a.y * b.z - a.z * b.y,
+      a.z * b.x - a.x * b.z,
+      a.x * b.y - a.y * b.x];
+/*
+    // normalize or auto calc normalize(norm) later by HLSL
+    let mut d = v.iter().map(|&p| p * p).sum::<f32>();
+    if d < 0.000001 { d = 1.0 };
+    let n = VECTOR::get(&[v[0] / d, v[1] / d, v[2] / d]);
+*/
+    let n = VECTOR::get(&v);
+    for k in 0..3 { vs[f * 3 + k].norm = n.clone(); }
+  }
+}
+
 /// set -Y to convert culling CCW(GL) to CW(DX) (front &lt;-&gt; back)
 /// - vts_gl 0 1 2 3 (1 2 0 2 3 0) to vss (0 3 2 0 2 1)
 /// - tex: true: texture color, false: vertex color
@@ -60,14 +82,7 @@ pub fn from_vts_gl(vts: &Vec<VT>, offset: &POS, scale: f32, tex: bool) ->
     let pos = VECTOR::get(&p); // shape <> CW + CW
     let spos = FLOAT4::zeros();
     let v = [vts[k].pos.x, vts[k].pos.y, vts[k].pos.z];
-/*
-    // calc norm
-    let mut d = v.iter().map(|&p| p * p).sum::<f32>();
-    if d < 0.000001 { d = 1.0 };
-    let norm = VECTOR::get(&[v[0] / d, v[1] / d, v[2] / d]);
-*/
-    // set norm through v and auto calc normalize(norm) later by HLSL
-    let norm = VECTOR::get(&v);
+    let norm = VECTOR::get(&v); // calc later
     let tan = VECTOR::zeros();
     let binorm = VECTOR::zeros();
     // (all white and alpha max when use texture)
@@ -79,6 +94,7 @@ pub fn from_vts_gl(vts: &Vec<VT>, offset: &POS, scale: f32, tex: bool) ->
     let suv = FLOAT2::zeros();
     vs.push(VERTEX3DSHADER{pos, spos, norm, tan, binorm, dif, spc, uv, suv});
   }
+  calc_norm(&mut vs);
   vs
 }
 

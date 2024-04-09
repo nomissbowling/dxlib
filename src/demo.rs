@@ -23,7 +23,7 @@ pub fn gen_vert() -> Vec<VERTEX3DSHADER> {
   ].iter().map(|t| {
     let pos = VECTOR::get(&t.0); // shape Z CW[0 1 2] + CCW[1 2 3]
     let spos = FLOAT4::zeros();
-    let norm = VECTOR::zeros();
+    let norm = VECTOR::get(&t.0); // calc later
     let tan = VECTOR::zeros();
     let binorm = VECTOR::zeros();
     let dif = COLOR_U8::get(&t.1); // diffuse (blend vetex color with texture)
@@ -35,6 +35,7 @@ pub fn gen_vert() -> Vec<VERTEX3DSHADER> {
   // add 2 vertices to make shape Z as CW[0 1 2] + CW[3 2 1]
   vert.push(vert[2].clone()); // vert[4]
   vert.push(vert[1].clone()); // vert[5]
+  calc_norm(&mut vert);
   vert
 }
 
