@@ -321,6 +321,16 @@ pub fn set_light_use_shadow_map(ssi: i32, flg: i32) -> i32 {
   unsafe { SetLightUseShadowMap(ssi, flg) }
 }
 
+/// (move)
+pub fn set_vs_const_f(i: i32, p: FLOAT4) -> i32 {
+  unsafe { SetVSConstF(i, p) }
+}
+
+/// (move)
+pub fn set_ps_const_f(i: i32, p: FLOAT4) -> i32 {
+  unsafe { SetPSConstF(i, p) }
+}
+
 pub fn set_use_back_culling(f: i32) -> i32 {
   unsafe { SetUseBackCulling(f) }
 }

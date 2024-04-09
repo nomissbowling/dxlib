@@ -175,6 +175,9 @@ pub fn screen(p: &str) -> Result<(), Box<dyn Error>> {
     shp.set_shader();
     // shg.set_shader();
 
+    // set_ps_const_f(VecL0, COLOR_F::get(&[1.0, 1.0, 1.0, 1.0]).as_float4());
+    // set_ps_const_f(PosL0, COLOR_F::get(&[0.0, 0.0, 0.0, 1.0]).as_float4());
+
     // after set_draw_screen
     let r = 512.0f32;
     let t = tick as f32 * m_pi / 180.0;

@@ -97,13 +97,16 @@ impl COLOR_F {
       c as f32 / 255.0).collect::<Vec<_>>();
     COLOR_F::new(v[0], v[1], v[2], v[3])
   }
-  pub fn from_float4(p: &FLOAT4) -> Self {
+  pub fn from_float4(p: &FLOAT4) -> Self { // not complemental as_float4
     let v = [p.x, p.y, p.z, p.w].iter().enumerate().map(|(i, &c)|
       if i < 3 { (c + 2.0) / 4.0 } else { 1.0 }).collect::<Vec<_>>();
     COLOR_F::new(v[0], v[1], v[2], v[3])
   }
   pub fn from_u32(u: u32) -> Self {
     COLOR_F::from_u8(&COLOR_U8::from_u32(u))
+  }
+  pub fn as_float4(&self) -> FLOAT4 { // not complemental from_float4
+    unsafe { (*(&self.r as *const f32 as *const FLOAT4)).clone() }
   }
 }
 
@@ -343,6 +346,9 @@ extern "stdcall" {
   pub fn SetLightRangeAtten(rng: f32, a0: f32, a1: f32, a2: f32) -> i32;
   pub fn SetLightAngle(oa: f32, ia: f32) -> i32; // oa 0-DX_PI_F ia 0-oa
   pub fn SetLightUseShadowMap(ssi: i32, flg: i32) -> i32;
+
+  pub fn SetVSConstF(i: i32, p: FLOAT4) -> i32;
+  pub fn SetPSConstF(i: i32, p: FLOAT4) -> i32;
 
   pub fn SetUseBackCulling(flg: i32) -> i32;
   pub fn SetRenderTargetToShader(target_index: i32, draw_screen: i32,
