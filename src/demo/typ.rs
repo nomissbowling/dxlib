@@ -6,6 +6,15 @@ use std::path::PathBuf;
 
 use crate::{dx::*, ext::*, ext::tdx::*, demo};
 
+pub fn proc_sh(sh: &impl Ts, ns: &[&str]) {
+  for n in ns {
+    let cnt = sh.get_const_count_to_shader(n);
+    let arr = sh.get_const_default_param_f_to_shader(n);
+    let idx = sh.get_const_index_to_shader(n);
+    println!("sh {}: {}, {:?}, {}", n, cnt, arr, idx);
+  }
+}
+
 pub fn screen(p: &str) -> Result<(), Box<dyn Error>> {
   let wf = false; // true: wire frame, false: surface
   let tex_mode = true; // true: texture color, false: vertex color
@@ -175,6 +184,12 @@ pub fn screen(p: &str) -> Result<(), Box<dyn Error>> {
     shp.set_shader();
     // shg.set_shader();
 
+    if tick == 0 {
+      proc_sh(&shv, &["g_Test\0", "g_Arr\0",
+        "g_Common\0", "g_Base\0", "g_OtherMatrix\0", "g_LocalWorldMatrix\0"]);
+      proc_sh(&shp, &["g_Test\0", "g_Arr\0",
+        "g_Common\0", "g_Base\0", "g_ShadowMap\0"]);
+    }
     // set_ps_const_f(VecL0, COLOR_F::get(&[1.0, 1.0, 1.0, 1.0]).as_float4());
     // set_ps_const_f(PosL0, COLOR_F::get(&[0.0, 0.0, 0.0, 1.0]).as_float4());
 

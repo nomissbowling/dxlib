@@ -347,6 +347,18 @@ extern "stdcall" {
   pub fn SetLightAngle(oa: f32, ia: f32) -> i32; // oa 0-DX_PI_F ia 0-oa
   pub fn SetLightUseShadowMap(ssi: i32, flg: i32) -> i32;
 
+  pub fn GetConstDefaultParamFToShader(
+    n: *const u8, sh: i32) -> *const FLOAT4;
+  pub fn GetConstDefaultParamFToShaderWithStrLen(
+    n: *const u8, l: usize, sh: i32) -> *const FLOAT4;
+  pub fn GetConstIndexToShader(
+    n: *const u8, sh: i32) -> i32;
+  pub fn GetConstIndexToShaderWithStrLen(
+    n: *const u8, l: usize, sh: i32) -> i32;
+  pub fn GetConstCountToShader(
+    n: *const u8, sh: i32) -> i32;
+  pub fn GetConstCountToShaderWithStrLen(
+    n: *const u8, l: usize, sh: i32) -> i32;
   pub fn SetVSConstF(i: i32, p: FLOAT4) -> i32;
   pub fn SetPSConstF(i: i32, p: FLOAT4) -> i32;
 

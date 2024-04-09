@@ -55,6 +55,13 @@ cbuffer cbD3D11_CONST_BUFFER_PS_SHADOWMAP : register(b2) {
 SamplerState g_DiffuseMapSampler : register(s0);
 Texture2D g_DiffuseMapTexture : register(t0);
 
+float4 g_Test = float4(2.2, 4.4, 6.6, 8.8);
+float4 g_Arr[4] = {
+  float4(0.2, 0.3, 0.4, 0.5),
+  float4(0.4, 0.5, 0.6, 0.7),
+  float4(0.6, 0.7, 0.8, 0.9),
+  float4(0.8, 0.9, 1.0, 1.1)};
+
 PS_OUTPUT main(PS_INPUT psi)
 {
   PS_OUTPUT pso;

@@ -30,6 +30,33 @@ pub trait Tr {
   fn dispose(&mut self);
 }
 
+pub trait Ts: Tr {
+  /// must end 0
+  fn get_const_default_param_f_to_shader(&self, n: &str) -> *const FLOAT4 {
+    unsafe { GetConstDefaultParamFToShader(n.as_ptr(), self.handle()) }
+  }
+  /// with len
+  fn get_const_default_param_f_to_shader_with_str_len(&self, n: &str, l: usize) -> *const FLOAT4 {
+    unsafe { GetConstDefaultParamFToShaderWithStrLen(n.as_ptr(), l, self.handle()) }
+  }
+  /// must end 0
+  fn get_const_index_to_shader(&self, n: &str) -> i32 {
+    unsafe { GetConstIndexToShader(n.as_ptr(), self.handle()) }
+  }
+  /// with len
+  fn get_const_index_to_shader_with_str_len(&self, n: &str, l: usize) -> i32 {
+    unsafe { GetConstIndexToShaderWithStrLen(n.as_ptr(), l, self.handle()) }
+  }
+  /// must end 0
+  fn get_const_count_to_shader(&self, n: &str) -> i32 {
+    unsafe { GetConstCountToShader(n.as_ptr(), self.handle()) }
+  }
+  /// with len
+  fn get_const_count_to_shader_with_str_len(&self, n: &str, l: usize) -> i32 {
+    unsafe { GetConstCountToShaderWithStrLen(n.as_ptr(), l, self.handle()) }
+  }
+}
+
 pub struct Tdx {
   pub tbl: HashMap<i32, RcTr>
 }

@@ -29,6 +29,10 @@ impl Tr for VertexShader {
   }
 }
 
+/// Ts for VertexShader
+impl Ts for VertexShader {
+}
+
 /// Drop for VertexShader
 impl Drop for VertexShader {
   /// drop
@@ -73,6 +77,10 @@ impl Tr for PixelShader {
   }
 }
 
+/// Ts for PixelShader
+impl Ts for PixelShader {
+}
+
 /// Drop for PixelShader
 impl Drop for PixelShader {
   /// drop
@@ -115,6 +123,10 @@ impl Tr for GeometryShader {
       self.h = 0;
     }
   }
+}
+
+/// Ts for GeometryShader
+impl Ts for GeometryShader {
 }
 
 /// Drop for GeometryShader
