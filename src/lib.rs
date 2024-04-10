@@ -1,4 +1,4 @@
-#![doc(html_root_url = "https://docs.rs/dxlib/0.3.17")]
+#![doc(html_root_url = "https://docs.rs/dxlib/0.3.18")]
 //! dxlib dll for Rust
 //!
 
