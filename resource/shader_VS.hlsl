@@ -63,12 +63,12 @@ cbuffer cbD3D11_CONST_BUFFER_VS_LOCALWORLDMATRIX : register(b3) {
 };
 
 cbuffer cb_Test : register(b4) {
-float4 g_Test = float4(1.1, 2.2, 3.3, 4.4);
+float4 g_Test = float4(1.1f, 2.2f, 3.3f, 4.4f);
 float4 g_Arr[4] = {
-  float4(0.1, 0.2, 0.3, 0.4),
-  float4(0.2, 0.3, 0.4, 0.5),
-  float4(0.3, 0.4, 0.5, 0.6),
-  float4(0.4, 0.5, 0.6, 0.7)};
+  float4(0.1f, 0.2f, 0.3f, 0.4f),
+  float4(0.2f, 0.3f, 0.4f, 0.5f),
+  float4(0.3f, 0.4f, 0.5f, 0.6f),
+  float4(0.4f, 0.5f, 0.6f, 0.7f)};
 };
 
 float4 g_Reg0 : register(c0);

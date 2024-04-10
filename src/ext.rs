@@ -7,6 +7,7 @@ pub mod music;
 pub mod sound;
 pub mod graph;
 pub mod shader;
+pub mod light;
 pub mod font;
 pub mod tdx;
 
@@ -38,7 +39,8 @@ impl VT {
 }
 
 /// calc norm or auto calc normalize(norm) later by HLSL
-pub fn calc_norm(vs: &mut Vec<VERTEX3DSHADER>) {
+/// nf: true: normalize, false: skip normalize
+pub fn calc_norm(vs: &mut Vec<VERTEX3DSHADER>, nf: bool) {
   let npolys = vs.len() / 3;
   for f in 0..npolys {
     let t = (0..3).into_iter().map(|k| &vs[f * 3 + k].pos).collect::<Vec<_>>();
@@ -48,13 +50,14 @@ pub fn calc_norm(vs: &mut Vec<VERTEX3DSHADER>) {
       a.y * b.z - a.z * b.y,
       a.z * b.x - a.x * b.z,
       a.x * b.y - a.y * b.x];
-/*
-    // normalize or auto calc normalize(norm) later by HLSL
-    let mut d = v.iter().map(|&p| p * p).sum::<f32>();
-    if d < 0.000001 { d = 1.0 };
-    let n = VECTOR::get(&[v[0] / d, v[1] / d, v[2] / d]);
-*/
-    let n = VECTOR::get(&v);
+    let n = match nf {
+    true => { // normalize
+      let mut d = v.iter().map(|&p| p * p).sum::<f32>();
+      if d < 0.000001 { d = 1.0 };
+      VECTOR::get(&[v[0] / d, v[1] / d, v[2] / d])
+    },
+    false => VECTOR::get(&v) // auto calc normalize(norm) later by HLSL
+    };
     for k in 0..3 { vs[f * 3 + k].norm = n.clone(); }
   }
 }
@@ -94,7 +97,7 @@ pub fn from_vts_gl(vts: &Vec<VT>, offset: &POS, scale: f32, tex: bool) ->
     let suv = FLOAT2::zeros();
     vs.push(VERTEX3DSHADER{pos, spos, norm, tan, binorm, dif, spc, uv, suv});
   }
-  calc_norm(&mut vs);
+  calc_norm(&mut vs, false);
   vs
 }
 

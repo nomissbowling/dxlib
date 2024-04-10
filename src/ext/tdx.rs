@@ -12,6 +12,7 @@ use crate::ext::music::Music;
 use crate::ext::sound::Sound;
 use crate::ext::graph::{Screen, Graph};
 use crate::ext::shader::{VertexShader, PixelShader, GeometryShader};
+use crate::ext::light::Light;
 use crate::ext::font::Font;
 
 pub type RcTr = Arc<RefCell<Box<dyn Tr>>>;
@@ -24,6 +25,7 @@ pub trait Tr {
   fn as_vertex_shader(&self) -> VertexShader { panic!("vertex_shader") }
   fn as_pixel_shader(&self) -> PixelShader { panic!("pixel_shader") }
   fn as_geometry_shader(&self) -> GeometryShader { panic!("geometry_shader") }
+  fn as_light(&self) -> Light { panic!("light") }
   fn as_font(&self) -> Font { panic!("font") }
 
   fn handle(&self) -> i32;
@@ -167,6 +169,40 @@ impl Tdx {
     .borrow().as_geometry_shader()
   }
 
+  /// (move)
+  pub fn create_dir_light(&mut self, d: VECTOR) -> Light {
+    self.reg(Box::new(Light::create_dir(d)))
+    .borrow().as_light()
+  }
+
+  /// (move)
+  pub fn create_spot_light(&mut self, p: VECTOR, d: VECTOR, oa: f32, ia: f32,
+    rng: f32, a0: f32, a1: f32, a2: f32) -> Light {
+    self.reg(Box::new(Light::create_spot(p, d, oa, ia, rng, a0, a1, a2)))
+    .borrow().as_light()
+  }
+
+  /// (move)
+  pub fn create_point_light(&mut self, p: VECTOR,
+    rng: f32, a0: f32, a1: f32, a2: f32) -> Light {
+    self.reg(Box::new(Light::create_point(p, rng, a0, a1, a2)))
+    .borrow().as_light()
+  }
+
+  pub fn get_enable_light_handle_num(&self) -> i32 {
+    unsafe { GetEnableLightHandleNum() }
+  }
+
+  pub fn get_enable_light_handle(&self, i: i32) -> i32 {
+// TODO: find from tbl and as_light before
+    unsafe { GetEnableLightHandle(i) }
+  }
+
+  pub fn delete_light_handle_all(&mut self) -> i32 {
+// TODO: unreg lights from tbl before
+    unsafe { DeleteLightHandleAll() }
+  }
+
   pub fn create_font(&mut self, n: &str, sz: i32, thick: i32,
     fonttype: i32, charset: i32, edgesz: i32, italic: i32) -> Font {
     self.reg(
@@ -230,6 +266,15 @@ pub fn get_hit_key_state_all(ksbuf: *const u8) -> i32 {
   unsafe { GetHitKeyStateAll(ksbuf) }
 }
 
+/// default DX_CHECKINPUT_ALL
+pub fn check_hit_key_all(typ: i32) -> i32 {
+  unsafe { CheckHitKeyAll(typ) }
+}
+
+pub fn check_hit_key(code: i32) -> i32 {
+  unsafe { CheckHitKey(code) }
+}
+
 pub fn wait_key() -> i32 {
   unsafe { WaitKey() }
 }
@@ -269,6 +314,10 @@ pub fn process_music_mem() -> i32 {
 
 pub fn init_shader() -> i32 {
   unsafe { InitShader() }
+}
+
+pub fn set_light_use_shadow_map_handle(lh: i32, ssi: i32, flg: i32) -> i32 {
+  unsafe { SetLightUseShadowMapHandle(lh, ssi, flg) }
 }
 
 pub fn set_material_use_vert_dif_color(flg: i32) -> i32 {

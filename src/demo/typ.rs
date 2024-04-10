@@ -43,6 +43,16 @@ pub fn screen(p: &str) -> Result<(), Box<dyn Error>> {
   let c60_center = from_vec_vec_vts_gl(&demo::gen_c60_center(tf),
     &POS::new(128.0, -192.0, -192.0, 1.0), 32.0, tex_mode);
 
+  let col = [
+    get_color(0, 0, 0),
+    get_color(255, 0, 0),
+    get_color(0, 255, 0),
+    get_color(255, 255, 0),
+    get_color(0, 0, 255),
+    get_color(255, 0, 255),
+    get_color(0, 255, 255),
+    get_color(255, 255, 255)];
+
   let base = PathBuf::from(p);
   let res: Vec<String> = vec![
     "Fantasie_Impromptu_op66.mid\0",
@@ -82,8 +92,15 @@ pub fn screen(p: &str) -> Result<(), Box<dyn Error>> {
   let shv = dx.load_vertex_shader(&res[6]);
   let shp = dx.load_pixel_shader(&res[7]);
   let shg = dx.load_geometry_shader(&res[8]);
-  println!("shv: {:08x} shp: {:08x} shg: {:08x}",
-    shv.handle(), shp.handle(), shg.handle());
+  let lt1 = dx.create_dir_light(VECTOR::new(-1.0, 1.0, -1.0)); // change later
+  println!("shv: {:08x} shp: {:08x} shg: {:08x} lt1: {:08x}",
+    shv.handle(), shp.handle(), shg.handle(), lt1.handle());
+  lt1.set_enable(TRUE);
+  lt1.set_dif_color(COLOR_F::from_u32(col[2]));
+  lt1.set_spc_color(COLOR_F::from_u32(col[2]));
+  lt1.set_amb_color(COLOR_F::get(&[0.33, 0.33, 0.33, 0.33]));
+  lt1.set_direction(VECTOR::get(&[-1.0, 1.0, -1.0])); // after construct
+  lt1.set_position(VECTOR::get(&[512.0, -512.0, 512.0])); // not direction
   init_font_to_handle();
   let fsys = dx.create_font("Arial\0", 32, 1, -1, -1, -1, TRUE); // italic
   let fdat = dx.load_font(&res[9]);
@@ -121,6 +138,8 @@ pub fn screen(p: &str) -> Result<(), Box<dyn Error>> {
   let m = 4;
   for tick in 0..n * m {
     if process_message() != 0 { break; }
+    if check_hit_key(0x01) != 0 { break; } // KEY_INPUT_ESCAPE
+    if check_hit_key(0x10) != 0 { break; } // KEY_INPUT_Q
     clear_draw_screen(NULL);
     set_use_z_buffer_3d(TRUE);
     set_write_z_buffer_3d(TRUE);
@@ -155,15 +174,6 @@ pub fn screen(p: &str) -> Result<(), Box<dyn Error>> {
     set_draw_screen(DX_SCREEN_WORK);
     set_use_lighting(TRUE); // default TRUE
     set_use_specular(TRUE); // default TRUE
-    let col = [
-      get_color(0, 0, 0),
-      get_color(255, 0, 0),
-      get_color(0, 255, 0),
-      get_color(255, 255, 0),
-      get_color(0, 0, 255),
-      get_color(255, 0, 255),
-      get_color(0, 255, 255),
-      get_color(255, 255, 255)];
     set_global_ambient_light(COLOR_F::from_u32(col[5]));
     set_use_light_angle_attenuation(TRUE); // default TRUE
     set_light_enable(TRUE); // default TRUE
@@ -185,6 +195,11 @@ pub fn screen(p: &str) -> Result<(), Box<dyn Error>> {
     // shg.set_shader();
 
     if tick == 0 {
+      let nl = dx.get_enable_light_handle_num();
+      for l in 0..nl {
+        let lh = dx.get_enable_light_handle(l);
+        println!("lh[{}] = {:08x}", l, lh);
+      }
       proc_sh(&shv, &["g_Reg0\0", "g_Reg1\0", "g_Test\0", "g_Arr\0",
         "g_Common\0", "g_Base\0", "g_OtherMatrix\0", "g_LocalWorldMatrix\0"]);
       proc_sh(&shp, &["g_Reg0\0", "g_Reg1\0", "g_Test\0", "g_Arr\0",

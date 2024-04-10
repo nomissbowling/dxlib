@@ -277,6 +277,8 @@ extern "stdcall" {
 
   pub fn GetJoypadInputState(inputtype: i32) -> i32;
   pub fn GetHitKeyStateAll(ksbuf: *const u8) -> i32; // 256 bytes
+  pub fn CheckHitKeyAll(typ: i32) -> i32; // DX_CHECKINPUT_ALL
+  pub fn CheckHitKey(code: i32) -> i32;
   pub fn WaitKey() -> i32; // call ProcessMessage() fps
   pub fn WaitTimer(msec: i32) -> i32; // call ProcessMessage() fps
   pub fn ProcessMessage() -> i32;
@@ -328,6 +330,37 @@ extern "stdcall" {
   pub fn LoadPixelShader(pso: *const u8) -> i32;
   pub fn LoadGeometryShader(gso: *const u8) -> i32;
   pub fn DeleteShader(h: i32) -> i32;
+
+  pub fn CreateDirLightHandle(d: VECTOR) -> i32;
+  pub fn CreateSpotLightHandle(p: VECTOR, d: VECTOR, oa: f32, ia: f32,
+    rng: f32, a0: f32, a1: f32, a2: f32) -> i32;
+  pub fn CreatePointLightHandle(p: VECTOR,
+    rng: f32, a0: f32, a1: f32, a2: f32) -> i32;
+  pub fn SetLightTypeHandle(lh: i32, typ: i32) -> i32;
+  pub fn SetLightEnableHandle(lh: i32, flg: i32) -> i32;
+  pub fn SetLightDifColorHandle(lh: i32, c: COLOR_F) -> i32;
+  pub fn SetLightSpcColorHandle(lh: i32, c: COLOR_F) -> i32;
+  pub fn SetLightAmbColorHandle(lh: i32, c: COLOR_F) -> i32;
+  pub fn SetLightDirectionHandle(lh: i32, d: VECTOR) -> i32;
+  pub fn SetLightPositionHandle(lh: i32, p: VECTOR) -> i32;
+  pub fn SetLightRangeAttenHandle(lh: i32,
+    rng: f32, a0: f32, a1: f32, a2: f32) -> i32;
+  pub fn SetLightAngleHandle(lh: i32, oa: f32, ia: f32) -> i32;
+  pub fn SetLightUseShadowMapHandle(lh: i32, ssi: i32, flg: i32) -> i32;
+  pub fn GetLightTypeHandle(lh: i32) -> i32; // DX_LIGHTTYPE_DIRECTIONAL etc
+  pub fn GetLightEnableHandle(lh: i32) -> i32;
+  pub fn GetLightDifColorHandle(lh: i32) -> COLOR_F;
+  pub fn GetLightSpcColorHandle(lh: i32) -> COLOR_F;
+  pub fn GetLightAmbColorHandle(lh: i32) -> COLOR_F;
+  pub fn GetLightDirectionHandle(lh: i32) -> VECTOR;
+  pub fn GetLightPositionHandle(lh: i32) -> VECTOR;
+  pub fn GetLightRangeAttenHandle(lh: i32,
+    rng: *mut f32, a0: *mut f32, a1: *mut f32, a2: *mut f32) -> i32;
+  pub fn GetLightAngleHandle(lh: i32, oa: *mut f32, ia: *mut f32) -> i32;
+  pub fn GetEnableLightHandleNum() -> i32;
+  pub fn GetEnableLightHandle(i: i32) -> i32;
+  pub fn DeleteLightHandle(lh: i32) -> i32;
+  pub fn DeleteLightHandleAll() -> i32;
 
   pub fn SetMaterialUseVertDifColor(flg: i32) -> i32; // default TRUE
   pub fn SetMaterialUseVertSpcColor(flg: i32) -> i32; // default TRUE

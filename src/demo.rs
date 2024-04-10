@@ -35,7 +35,7 @@ pub fn gen_vert() -> Vec<VERTEX3DSHADER> {
   // add 2 vertices to make shape Z as CW[0 1 2] + CW[3 2 1]
   vert.push(vert[2].clone()); // vert[4]
   vert.push(vert[1].clone()); // vert[5]
-  calc_norm(&mut vert);
+  calc_norm(&mut vert, false);
   vert
 }
 
