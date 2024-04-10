@@ -100,7 +100,7 @@ LIGHT proc_light(float3 n, float3 lookat, int lh)
 //  float3 r = normalize(lookat + light_dir);
 //  float3 r = -normalize(lookat + light_dir);
 //  float3 r = -normalize(light_dir);
-  LIGHT l = {test, light_amb, light_vec4, dot(r, n), float3(0.0f, 0.0f, 0.0f)};
+  LIGHT l = {test, light_amb, light_vec4, max(0.0f, dot(r, n)), float3(0.0f, 0.0f, 0.0f)};
   return l;
 }
 
@@ -132,13 +132,13 @@ PS_OUTPUT main(PS_INPUT psi)
   s[5] = psi.spc * pow(l[5].a, l[5].vec4.w);
 //  s[5] = psi.spc * pow(l[5].a, 1.0f);
 
-  float r[6] = {1.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f}; // not use loop in HLSL
-  float a = r[0] * l[0].a + r[1] * l[1].a + r[2] * l[2].a
-    + r[3] * l[3].a + r[4] * l[4].a + r[5] * l[5].a;
-  float4 amb = r[0] * l[0].amb + r[1] * l[1].amb + r[2] * l[2].amb
-    + r[3] * l[3].amb + r[4] * l[4].amb + r[5] * l[5].amb;
-  float4 ss = r[0] * s[0] + r[1] * s[1] + r[2] * s[2]
-    + r[3] * s[3] + r[4] * s[4] + r[5] * s[5];
+  float r[6] = {0.8f, 0.8f, 0.8f, 0.0f, 0.0f, 0.0f}; // not use loop in HLSL
+  float a = min(1.0f, r[0] * l[0].a + r[1] * l[1].a + r[2] * l[2].a
+    + r[3] * l[3].a + r[4] * l[4].a + r[5] * l[5].a);
+  float4 amb = min(1.0f, r[0] * l[0].amb + r[1] * l[1].amb + r[2] * l[2].amb
+    + r[3] * l[3].amb + r[4] * l[4].amb + r[5] * l[5].amb);
+  float4 ss = min(1.0f, r[0] * s[0] + r[1] * s[1] + r[2] * s[2]
+    + r[3] * s[3] + r[4] * s[4] + r[5] * s[5]);
 
   // texture diffused color
   float4 dc = g_DiffuseMapTexture.Sample(g_DiffuseMapSampler, psi.texCoords0);
