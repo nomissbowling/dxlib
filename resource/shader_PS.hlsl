@@ -132,7 +132,7 @@ PS_OUTPUT main(PS_INPUT psi)
   s[5] = psi.spc * pow(l[5].a, l[5].vec4.w);
 //  s[5] = psi.spc * pow(l[5].a, 1.0f);
 
-  float r[6] = {0.8f, 0.8f, 0.8f, 0.0f, 0.0f, 0.0f}; // not use loop in HLSL
+  float r[6] = {0.8f, 0.8f, 0.8f, 0.8f, 0.0f, 0.0f}; // not use loop in HLSL
   float a = min(1.0f, r[0] * l[0].a + r[1] * l[1].a + r[2] * l[2].a
     + r[3] * l[3].a + r[4] * l[4].a + r[5] * l[5].a);
   float4 amb = min(1.0f, r[0] * l[0].amb + r[1] * l[1].amb + r[2] * l[2].amb

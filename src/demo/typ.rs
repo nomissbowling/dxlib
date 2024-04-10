@@ -52,6 +52,7 @@ pub fn screen(p: &str) -> Result<(), Box<dyn Error>> {
     get_color(255, 0, 255),
     get_color(0, 255, 255),
     get_color(255, 255, 255)];
+  let amb = COLOR_F::get(&[0.33, 0.33, 0.33, 0.33]);
 
   let base = PathBuf::from(p);
   let res: Vec<String> = vec![
@@ -92,23 +93,35 @@ pub fn screen(p: &str) -> Result<(), Box<dyn Error>> {
   let shv = dx.load_vertex_shader(&res[6]);
   let shp = dx.load_pixel_shader(&res[7]);
   let shg = dx.load_geometry_shader(&res[8]);
+  println!("shv: {:08x} shp: {:08x} shg: {:08x}",
+    shv.handle(), shp.handle(), shg.handle());
 
-  let lt1 = dx.create_dir_light(VECTOR::new(0.0, 1.0, -1.0)); // change later
-  let lt2 = dx.create_dir_light(VECTOR::new(-1.0, 1.0, 0.0)); // change later
-  println!("shv: {:08x} shp: {:08x} shg: {:08x} lt1: {:08x} lt2: {:08x}",
-    shv.handle(), shp.handle(), shg.handle(), lt1.handle(), lt2.handle());
-  lt1.set_enable(TRUE);
-  lt2.set_enable(TRUE);
-  lt1.set_dif_color(COLOR_F::from_u32(col[2]));
-  lt1.set_spc_color(COLOR_F::from_u32(col[2]));
-  lt1.set_amb_color(COLOR_F::get(&[0.33, 0.33, 0.33, 0.33]));
-  lt1.set_direction(VECTOR::get(&[0.0, 1.0, -1.0])); // after construct
-  lt1.set_position(VECTOR::get(&[0.0, -512.0, 512.0])); // not direction
-  lt2.set_dif_color(COLOR_F::from_u32(col[6]));
-  lt2.set_spc_color(COLOR_F::from_u32(col[6]));
-  lt2.set_amb_color(COLOR_F::get(&[0.33, 0.33, 0.33, 0.33]));
-  lt2.set_direction(VECTOR::get(&[-1.0, 1.0, 0.0])); // after construct
-  lt2.set_position(VECTOR::get(&[512.0, -512.0, 0.0])); // not direction
+  let lights = vec![
+    light::LightParamSub::new(DX_LIGHTTYPE_DIRECTIONAL, // default light
+      COLOR_F::from_u32(col[7]), COLOR_F::from_u32(col[7]), amb.clone(),
+      VECTOR::get(&[-1.0, 1.0, -1.0]), VECTOR::get(&[1.0, -1.0, 1.0])),
+    light::LightParamSub::new(DX_LIGHTTYPE_DIRECTIONAL,
+      COLOR_F::from_u32(col[2]), COLOR_F::from_u32(col[2]), amb.clone(),
+      VECTOR::get(&[0.0, -512.0, 512.0]), VECTOR::new(0.0, 1.0, -1.0)),
+    light::LightParamSub::new(DX_LIGHTTYPE_DIRECTIONAL,
+      COLOR_F::from_u32(col[6]), COLOR_F::from_u32(col[6]), amb.clone(),
+      VECTOR::get(&[512.0, -512.0, 0.0]), VECTOR::new(-1.0, 1.0, 0.0)),
+    light::LightParamSub::new(DX_LIGHTTYPE_DIRECTIONAL,
+      COLOR_F::from_u32(col[5]), COLOR_F::from_u32(col[5]), amb.clone(),
+      VECTOR::get(&[0.0, 512.0, 0.0]), VECTOR::new(0.0, -1.0, 0.0))];
+  let ls = (1..lights.len()).into_iter().map(|k| { // starts from 1 (0 default)
+    // if lights[k].light_type == DX_LIGHTTYPE_DIRECTIONAL {} // TODO: skip
+    let lt = dx.create_dir_light(lights[k].direction.clone()); // change later
+    println!("light[{}]: {:08x}", k, lt.handle());
+    lt.set_enable(TRUE);
+    lt.set_dif_color(lights[k].diffuse.clone());
+    lt.set_spc_color(lights[k].specular.clone());
+    lt.set_amb_color(lights[k].ambient.clone());
+    lt.set_position(lights[k].position.clone()); // not direction
+    lt.set_direction(lights[k].direction.clone()); // after construct
+    lt
+  }).collect::<Vec<_>>();
+  println!("lights: {} + 1", ls.len());
 
   init_font_to_handle();
   let fsys = dx.create_font("Arial\0", 32, 1, -1, -1, -1, TRUE); // italic
@@ -186,11 +199,11 @@ pub fn screen(p: &str) -> Result<(), Box<dyn Error>> {
     set_global_ambient_light(COLOR_F::from_u32(col[5]));
     set_use_light_angle_attenuation(TRUE); // default TRUE
     set_light_enable(TRUE); // default TRUE
-    set_light_dif_color(COLOR_F::from_u32(col[7]));
-    set_light_spc_color(COLOR_F::from_u32(col[7]));
-    set_light_amb_color(COLOR_F::get(&[0.33, 0.33, 0.33, 0.33]));
-    set_light_direction(VECTOR::get(&[1.0, -1.0, 1.0]));
-    // set_light_position(VECTOR::get(&[-1.0, 1.0, -1.0])); // not direction
+    set_light_dif_color(lights[0].diffuse.clone());
+    set_light_spc_color(lights[0].specular.clone());
+    set_light_amb_color(lights[0].ambient.clone());
+    // set_light_position(lights[0].position.clone()); // not direction
+    set_light_direction(lights[0].direction.clone());
     // set_light_range_atten(1000.0, 1.0, 0.5, 0.25);
     // set_light_angle(2.0 * pi / 3.0, pi / 2.0);
     // set_light_use_shadow_map(ssi, TRUE);

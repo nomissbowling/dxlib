@@ -3,6 +3,32 @@
 
 use crate::{dx::*, ext::tdx::*};
 
+/// LightParamSub (see also dx::LIGHTPARAM)
+pub struct LightParamSub {
+  /// light type (TODO: now only DX_LIGHTTYPE_DIRECTIONAL)
+  pub light_type: i32,
+  /// diffuse
+  pub diffuse: COLOR_F,
+  /// specular
+  pub specular: COLOR_F,
+  /// ambient
+  pub ambient: COLOR_F,
+  /// position (not for direction light)
+  pub position: VECTOR,
+  /// direction
+  pub direction: VECTOR
+}
+
+/// LightParamSub
+impl LightParamSub {
+  /// constructor
+  pub fn new(light_type: i32,
+    diffuse: COLOR_F, specular: COLOR_F, ambient: COLOR_F,
+    position: VECTOR, direction: VECTOR) -> Self {
+    LightParamSub{light_type, diffuse, specular, ambient, position, direction}
+  }
+}
+
 /// Light
 pub struct Light {
   /// to be disposed
