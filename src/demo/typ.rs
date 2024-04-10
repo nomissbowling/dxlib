@@ -92,15 +92,24 @@ pub fn screen(p: &str) -> Result<(), Box<dyn Error>> {
   let shv = dx.load_vertex_shader(&res[6]);
   let shp = dx.load_pixel_shader(&res[7]);
   let shg = dx.load_geometry_shader(&res[8]);
-  let lt1 = dx.create_dir_light(VECTOR::new(-1.0, 1.0, -1.0)); // change later
-  println!("shv: {:08x} shp: {:08x} shg: {:08x} lt1: {:08x}",
-    shv.handle(), shp.handle(), shg.handle(), lt1.handle());
+
+  let lt1 = dx.create_dir_light(VECTOR::new(0.0, 1.0, -1.0)); // change later
+  let lt2 = dx.create_dir_light(VECTOR::new(-1.0, 1.0, 0.0)); // change later
+  println!("shv: {:08x} shp: {:08x} shg: {:08x} lt1: {:08x} lt2: {:08x}",
+    shv.handle(), shp.handle(), shg.handle(), lt1.handle(), lt2.handle());
   lt1.set_enable(TRUE);
+  lt2.set_enable(TRUE);
   lt1.set_dif_color(COLOR_F::from_u32(col[2]));
   lt1.set_spc_color(COLOR_F::from_u32(col[2]));
   lt1.set_amb_color(COLOR_F::get(&[0.33, 0.33, 0.33, 0.33]));
-  lt1.set_direction(VECTOR::get(&[-1.0, 1.0, -1.0])); // after construct
-  lt1.set_position(VECTOR::get(&[512.0, -512.0, 512.0])); // not direction
+  lt1.set_direction(VECTOR::get(&[0.0, 1.0, -1.0])); // after construct
+  lt1.set_position(VECTOR::get(&[0.0, -512.0, 512.0])); // not direction
+  lt2.set_dif_color(COLOR_F::from_u32(col[6]));
+  lt2.set_spc_color(COLOR_F::from_u32(col[6]));
+  lt2.set_amb_color(COLOR_F::get(&[0.33, 0.33, 0.33, 0.33]));
+  lt2.set_direction(VECTOR::get(&[-1.0, 1.0, 0.0])); // after construct
+  lt2.set_position(VECTOR::get(&[512.0, -512.0, 0.0])); // not direction
+
   init_font_to_handle();
   let fsys = dx.create_font("Arial\0", 32, 1, -1, -1, -1, TRUE); // italic
   let fdat = dx.load_font(&res[9]);

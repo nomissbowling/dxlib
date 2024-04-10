@@ -110,37 +110,44 @@ PS_OUTPUT main(PS_INPUT psi)
 
   float4 eye_pos4 = float4(0.0f, 0.0f, 0.0f, 1.0f);
 
-  LIGHT l0 = proc_light(normalize(psi.norm.xyz), eye_pos4.xyz, 0);
-  float a0 = l0.a;
-  float w0 = l0.vec4.w;
-  float4 amb0 = l0.amb;
-  float4 test0 = l0.test;
+  LIGHT l[6]; // not use loop in HLSL
+  l[0] = proc_light(normalize(psi.norm.xyz), eye_pos4.xyz, 0);
+  l[1] = proc_light(normalize(psi.norm.xyz), eye_pos4.xyz, 1);
+  l[2] = proc_light(normalize(psi.norm.xyz), eye_pos4.xyz, 2);
+  l[3] = proc_light(normalize(psi.norm.xyz), eye_pos4.xyz, 3);
+  l[4] = proc_light(normalize(psi.norm.xyz), eye_pos4.xyz, 4);
+  l[5] = proc_light(normalize(psi.norm.xyz), eye_pos4.xyz, 5);
 
-  float4 s0 = psi.spc * pow(a0, w0);
-//  float4 s0 = psi.spc * pow(a0, 1.0f);
+  float4 s[6]; // not use loop in HLSL
+  s[0] = psi.spc * pow(l[0].a, l[0].vec4.w);
+//  s[0] = psi.spc * pow(l[0].a, 1.0f);
+  s[1] = psi.spc * pow(l[1].a, l[1].vec4.w);
+//  s[1] = psi.spc * pow(l[1].a, 1.0f);
+  s[2] = psi.spc * pow(l[2].a, l[2].vec4.w);
+//  s[2] = psi.spc * pow(l[2].a, 1.0f);
+  s[3] = psi.spc * pow(l[3].a, l[3].vec4.w);
+//  s[3] = psi.spc * pow(l[3].a, 1.0f);
+  s[4] = psi.spc * pow(l[4].a, l[4].vec4.w);
+//  s[4] = psi.spc * pow(l[4].a, 1.0f);
+  s[5] = psi.spc * pow(l[5].a, l[5].vec4.w);
+//  s[5] = psi.spc * pow(l[5].a, 1.0f);
 
-  LIGHT l1 = proc_light(normalize(psi.norm.xyz), eye_pos4.xyz, 1);
-  float a1 = l1.a;
-  float w1 = l1.vec4.w;
-  float4 amb1 = l1.amb;
-  float4 test1 = l1.test;
-
-  float4 s1 = psi.spc * pow(a1, w1);
-//  float4 s1 = psi.spc * pow(a1, 1.0f);
-
-  float p = 1.0f;
-  float q = 1.0f - p;
-  float a = p * a0 + q * a1; // dot(float2(p, q), float2(a0, a1));
-  float4 amb = p * amb0 + q * amb1;
-  float4 s = p * s0 + q * s1;
+  float r[6] = {1.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f}; // not use loop in HLSL
+  float a = r[0] * l[0].a + r[1] * l[1].a + r[2] * l[2].a
+    + r[3] * l[3].a + r[4] * l[4].a + r[5] * l[5].a;
+  float4 amb = r[0] * l[0].amb + r[1] * l[1].amb + r[2] * l[2].amb
+    + r[3] * l[3].amb + r[4] * l[4].amb + r[5] * l[5].amb;
+  float4 ss = r[0] * s[0] + r[1] * s[1] + r[2] * s[2]
+    + r[3] * s[3] + r[4] * s[4] + r[5] * s[5];
 
   // texture diffused color
   float4 dc = g_DiffuseMapTexture.Sample(g_DiffuseMapSampler, psi.texCoords0);
 //  pso.color0 = dc * psi.dif; // not use light spc
-//  pso.color0 = dc * psi.dif * a0 + s0 + amb0; // only light 0
-//  pso.color0 = dc * psi.dif * a1 + s1 + amb1; // only light 1
-//  pso.color0 = (dc * psi.dif * a1 + s1 + amb1) * a0 + s0 + amb0;
-  pso.color0 = dc * psi.dif * a + s + amb;
+//  pso.color0 = dc * psi.dif * l[0].a + s[0] + l[0].amb; // only light 0
+//  pso.color0 = dc * psi.dif * l[1].a + s[1] + l[1].amb; // only light 1
+//  pso.color0 = (dc * psi.dif * l[1].a + s[1] + l[1].amb)
+//    * l[0].a + s[0] + l[0].amb;
+  pso.color0 = dc * psi.dif * a + ss + amb;
 //  pso.color0 = test0; // test by light 0 direction or specular
 //  pso.color0 = test1; // test by light 1 direction or specular
   return pso;
