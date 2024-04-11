@@ -1,6 +1,6 @@
 [package]
 name = "dxlib"
-version = "0.3.18" # change with html_root_url in lib.rs
+version = "0.4.0" # change with html_root_url in lib.rs
 edition = "2021"
 authors = ["nomissbowling <nomissbowling@yahoo.co.jp>"]
 
