@@ -12,6 +12,7 @@ use crate::ext::music::Music;
 use crate::ext::sound::Sound;
 use crate::ext::graph::{Screen, Graph};
 use crate::ext::shader::{VertexShader, PixelShader, GeometryShader};
+use crate::ext::shader::ConstantBuffer;
 use crate::ext::light::Light;
 use crate::ext::font::Font;
 
@@ -25,6 +26,7 @@ pub trait Tr {
   fn as_vertex_shader(&self) -> VertexShader { panic!("vertex_shader") }
   fn as_pixel_shader(&self) -> PixelShader { panic!("pixel_shader") }
   fn as_geometry_shader(&self) -> GeometryShader { panic!("geometry_shader") }
+  fn as_constant_buffer(&self) -> ConstantBuffer { panic!("constant_buffer") }
   fn as_light(&self) -> Light { panic!("light") }
   fn as_font(&self) -> Font { panic!("font") }
 
@@ -32,28 +34,31 @@ pub trait Tr {
   fn dispose(&mut self);
 }
 
+/// for DX11 and DX9
 pub trait Ts: Tr {
-  /// must end 0
+  /// for DX11
+  fn set_const(&self, cb: &ConstantBuffer, slot: i32) -> i32;
+  /// must end 0 (for DX9)
   fn get_const_default_param_f_to_shader(&self, n: &str) -> *const FLOAT4 {
     unsafe { GetConstDefaultParamFToShader(n.as_ptr(), self.handle()) }
   }
-  /// with len
+  /// with len (for DX9)
   fn get_const_default_param_f_to_shader_with_str_len(&self, n: &str, l: usize) -> *const FLOAT4 {
     unsafe { GetConstDefaultParamFToShaderWithStrLen(n.as_ptr(), l, self.handle()) }
   }
-  /// must end 0
+  /// must end 0 (for DX9)
   fn get_const_index_to_shader(&self, n: &str) -> i32 {
     unsafe { GetConstIndexToShader(n.as_ptr(), self.handle()) }
   }
-  /// with len
+  /// with len (for DX9)
   fn get_const_index_to_shader_with_str_len(&self, n: &str, l: usize) -> i32 {
     unsafe { GetConstIndexToShaderWithStrLen(n.as_ptr(), l, self.handle()) }
   }
-  /// must end 0
+  /// must end 0 (for DX9)
   fn get_const_count_to_shader(&self, n: &str) -> i32 {
     unsafe { GetConstCountToShader(n.as_ptr(), self.handle()) }
   }
-  /// with len
+  /// with len (for DX9)
   fn get_const_count_to_shader_with_str_len(&self, n: &str, l: usize) -> i32 {
     unsafe { GetConstCountToShaderWithStrLen(n.as_ptr(), l, self.handle()) }
   }
@@ -167,6 +172,13 @@ impl Tdx {
   pub fn load_geometry_shader(&mut self, n: &String) -> GeometryShader {
     self.reg(Box::new(GeometryShader::load(n)))
     .borrow().as_geometry_shader()
+  }
+
+  /// for DX11
+  /// - n: number of FLOAT4 (alloc n * 4 * sizeof f32)
+  pub fn create_constant_buffer(&mut self, n: i32) -> ConstantBuffer {
+    self.reg(Box::new(ConstantBuffer::create(n)))
+    .borrow().as_constant_buffer()
   }
 
   /// (move)
@@ -397,12 +409,17 @@ pub fn set_light_use_shadow_map(ssi: i32, flg: i32) -> i32 {
   unsafe { SetLightUseShadowMap(ssi, flg) }
 }
 
-/// (move)
+/// for DX11
+pub fn init_shader_constant_buffer() -> i32 {
+  unsafe { InitShaderConstantBuffer() }
+}
+
+/// (move) for DX9
 pub fn set_vs_const_f(i: i32, p: FLOAT4) -> i32 {
   unsafe { SetVSConstF(i, p) }
 }
 
-/// (move)
+/// (move) for DX9
 pub fn set_ps_const_f(i: i32, p: FLOAT4) -> i32 {
   unsafe { SetPSConstF(i, p) }
 }

@@ -380,20 +380,28 @@ extern "stdcall" {
   pub fn SetLightAngle(oa: f32, ia: f32) -> i32; // oa 0-DX_PI_F ia 0-oa
   pub fn SetLightUseShadowMap(ssi: i32, flg: i32) -> i32;
 
+  pub fn InitShaderConstantBuffer() -> i32; // DX11
+  pub fn CreateShaderConstantBuffer(sz: i32) -> i32; // DX11 n * 4 * sizeof f32
+  pub fn DeleteShaderConstantBuffer(cbh: i32) -> i32; // DX11
+  pub fn GetBufferShaderConstantBuffer(cbh: i32) -> *mut FLOAT4; // DX11
+  pub fn UpdateShaderConstantBuffer(cbh: i32) -> i32; // DX11
+  pub fn SetShaderConstantBuffer(cbh: i32, ts: i32, slot: i32) -> i32; // DX
+  // ts: DX_SHADERTYPE_VERTEX DX_SHADERTYPE_PIXEL etc
+
   pub fn GetConstDefaultParamFToShader(
-    n: *const u8, sh: i32) -> *const FLOAT4;
+    n: *const u8, sh: i32) -> *const FLOAT4; // DX9
   pub fn GetConstDefaultParamFToShaderWithStrLen(
-    n: *const u8, l: usize, sh: i32) -> *const FLOAT4;
+    n: *const u8, l: usize, sh: i32) -> *const FLOAT4; // DX9
   pub fn GetConstIndexToShader(
-    n: *const u8, sh: i32) -> i32;
+    n: *const u8, sh: i32) -> i32; // DX9
   pub fn GetConstIndexToShaderWithStrLen(
-    n: *const u8, l: usize, sh: i32) -> i32;
+    n: *const u8, l: usize, sh: i32) -> i32; // DX9
   pub fn GetConstCountToShader(
-    n: *const u8, sh: i32) -> i32;
+    n: *const u8, sh: i32) -> i32; // DX9
   pub fn GetConstCountToShaderWithStrLen(
-    n: *const u8, l: usize, sh: i32) -> i32;
-  pub fn SetVSConstF(i: i32, p: FLOAT4) -> i32;
-  pub fn SetPSConstF(i: i32, p: FLOAT4) -> i32;
+    n: *const u8, l: usize, sh: i32) -> i32; // DX9
+  pub fn SetVSConstF(i: i32, p: FLOAT4) -> i32; // DX9
+  pub fn SetPSConstF(i: i32, p: FLOAT4) -> i32; // DX9
 
   pub fn SetUseBackCulling(flg: i32) -> i32;
   pub fn SetRenderTargetToShader(target_index: i32, draw_screen: i32,
@@ -509,6 +517,13 @@ pub const DX_DIRECT3D_11_FEATURE_LEVEL_10_0: i32 = 0xa000;
 pub const DX_DIRECT3D_11_FEATURE_LEVEL_10_1: i32 = 0xa100;
 pub const DX_DIRECT3D_11_FEATURE_LEVEL_11_0: i32 = 0xb000;
 pub const DX_DIRECT3D_11_FEATURE_LEVEL_11_1: i32 = 0xb100;
+
+pub const DX_SHADERTYPE_VERTEX: i32 = 0;
+pub const DX_SHADERTYPE_PIXEL: i32 = 1;
+pub const DX_SHADERTYPE_GEOMETRY: i32 = 2;
+pub const DX_SHADERTYPE_COMPUTE: i32 = 3;
+pub const DX_SHADERTYPE_DOMAIN: i32 = 4;
+pub const DX_SHADERTYPE_HULL: i32 = 5;
 
 pub const DX_LIGHTTYPE_D3DLIGHT_POINT: i32 = 1; // D_D3DLIGHT_POINT
 pub const DX_LIGHTTYPE_D3DLIGHT_SPOT: i32 = 2; // D_D3DLIGHT_SPOT

@@ -6,12 +6,21 @@ use std::path::PathBuf;
 
 use crate::{dx::*, ext::*, ext::tdx::*, demo};
 
+/// for DX11
+pub fn proc_cb(t: &str, b_cb: &[FLOAT4]) {
+  println!("{}", t);
+  for f4 in b_cb {
+    println!("{:?}", f4);
+  }
+}
+
+/// for DX9
 pub fn proc_sh(sh: &impl Ts, ns: &[&str]) {
   for n in ns {
     let cnt = sh.get_const_count_to_shader(n);
     let arr = sh.get_const_default_param_f_to_shader(n);
     let idx = sh.get_const_index_to_shader(n);
-    println!("sh {}: {}, {:?}, {}", n, cnt, arr, idx);
+    println!("sh [{:?}] {}, {:?}, {}", n, cnt, arr, idx);
   }
 }
 
@@ -95,6 +104,27 @@ pub fn screen(p: &str) -> Result<(), Box<dyn Error>> {
   let shg = dx.load_geometry_shader(&res[8]);
   println!("shv: {:08x} shp: {:08x} shg: {:08x}",
     shv.handle(), shp.handle(), shg.handle());
+
+  // DX11 constant buffer
+  // cbv slot 4 cb_Test(f4 g_Test, f4[4] g_Arr)
+  // cbp slot 4 cb_Test(f4 g_Test, f4[4] g_Arr)
+  // cbg slot none
+  // cbu slot 3 cb_EyeLight(EyeLight g_EL(f4 eye_pos4, f[6] r, f2 padding))
+  // cb5 slot 5 cb_5(f4 cb_eye_pos4)
+  // cb6 slot 6 cb_6(f4 cb_a, f4 cb_b)
+  // cb7 slot 7 cb_7(f4 cb_c)
+  init_shader_constant_buffer(); // DX11
+  let cbv = dx.create_constant_buffer(5);
+  let cbp = dx.create_constant_buffer(5);
+  let cbg = dx.create_constant_buffer(0);
+  let cbu = dx.create_constant_buffer(3);
+  let cb5 = dx.create_constant_buffer(1);
+  let cb6 = dx.create_constant_buffer(2);
+  let cb7 = dx.create_constant_buffer(1);
+  println!("cbv: {:08x}, cbp: {:08x} cbg: {:08x} cbu: {:08x}",
+    cbv.handle(), cbp.handle(), cbg.handle(), cbu.handle());
+  println!("cb5: {:08x}, cb6: {:08x} cb7: {:08x}",
+    cb5.handle(), cb6.handle(), cb7.handle());
 
   let lights = vec![
     light::LightParamSub::new(DX_LIGHTTYPE_DIRECTIONAL, // default light
@@ -216,19 +246,72 @@ pub fn screen(p: &str) -> Result<(), Box<dyn Error>> {
     shp.set_shader();
     // shg.set_shader();
 
+    // for DX11 (may be constant address in the loop)
+    let b_cbv = cbv.as_slice_mut();
+    let b_cbp = cbp.as_slice_mut();
+    let b_cbg = cbg.as_slice_mut();
+    let b_cbu = cbu.as_slice_mut();
+    let b_cb5 = cb5.as_slice_mut();
+    let b_cb6 = cb6.as_slice_mut();
+    let b_cb7 = cb7.as_slice_mut();
     if tick == 0 {
       let nl = dx.get_enable_light_handle_num();
       for l in 0..nl {
         let lh = dx.get_enable_light_handle(l);
         println!("lh[{}] = {:08x}", l, lh);
       }
+      // for DX11 (may be constant address in the loop)
+      println!("cbv buffer: {:?}", cbv.ptr_mut());
+      println!("cbp buffer: {:?}", cbp.ptr_mut());
+      println!("cbg buffer: {:?}", cbg.ptr_mut());
+      println!("cbu buffer: {:?}", cbu.ptr_mut());
+      println!("cb5 buffer: {:?}", cb5.ptr_mut());
+      println!("cb6 buffer: {:?}", cb6.ptr_mut());
+      println!("cb7 buffer: {:?}", cb7.ptr_mut());
+/*
+      // for DX9
       proc_sh(&shv, &["g_Reg0\0", "g_Reg1\0", "g_Test\0", "g_Arr\0",
         "g_Common\0", "g_Base\0", "g_OtherMatrix\0", "g_LocalWorldMatrix\0"]);
       proc_sh(&shp, &["g_Reg0\0", "g_Reg1\0", "g_Test\0", "g_Arr\0",
-        "g_Common\0", "g_Base\0", "g_ShadowMap\0"]);
+        "g_Common\0", "g_Base\0", "g_ShadowMap\0", "g_EL\0"]);
+*/
     }
-    // set_ps_const_f(VecL0, COLOR_F::get(&[1.0, 1.0, 1.0, 1.0]).as_float4());
-    // set_ps_const_f(PosL0, COLOR_F::get(&[0.0, 0.0, 0.0, 1.0]).as_float4());
+    // for DX11
+    if tick <= 1 {
+      proc_cb("b_cbv", b_cbv);
+      proc_cb("b_cbp", b_cbp);
+      proc_cb("b_cbg", b_cbg);
+      proc_cb("b_cbu", b_cbu);
+      proc_cb("b_cb5", b_cb5);
+      proc_cb("b_cb6", b_cb6);
+      proc_cb("b_cb7", b_cb7);
+    }
+    cbv.update();
+    shv.set_const(&cbv, 4);
+    cbp.update();
+    shp.set_const(&cbp, 4);
+    cbg.update();
+    shg.set_const(&cbg, 0);
+    b_cbu[0] = FLOAT4::new(0.0, 0.0, 0.0, 1.0); // g_EL.eye_pos4
+    b_cbu[1] = FLOAT4::new(0.8, 0.8, 0.8, 0.8); // g_EL.r[0-3]
+    b_cbu[2] = FLOAT4::new(0.0, 0.0, 0.0, 0.0); // g_EL.r[4,5], f2 padding
+    cbu.update();
+    shp.set_const(&cbu, 3);
+    b_cb5[0] = FLOAT4::new(0.0, 0.0, 0.0, 1.0); // cb_eye_pos4
+    cb5.update();
+    shp.set_const(&cb5, 5);
+    b_cb6[0] = FLOAT4::new(0.8, 0.8, 0.8, 0.8); // cb_a
+    b_cb6[1] = FLOAT4::new(0.0, 0.0, 0.0, 0.0); // cb_b
+    cb6.update();
+    shp.set_const(&cb6, 6);
+    b_cb7[0] = FLOAT4::new(0.0, 0.0, 0.0, 0.0); // cb_c
+    cb7.update();
+    shp.set_const(&cb7, 7);
+/*
+    // for DX9
+    set_ps_const_f(VecL0, COLOR_F::get(&[1.0, 1.0, 1.0, 1.0]).as_float4());
+    set_ps_const_f(PosL0, COLOR_F::get(&[0.0, 0.0, 0.0, 1.0]).as_float4());
+*/
 
     // after set_draw_screen
     let r = 512.0f32;

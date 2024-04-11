@@ -67,6 +67,29 @@ float4 g_Arr[4] = {
 float4 g_Reg0 : register(c0);
 float4 g_Reg1 : register(c1);
 
+struct EyeLight {
+  float4 eye_pos4;
+  float r[6];
+  float2 padding;
+};
+
+cbuffer cb_EyeLight : register(b3) { // max 14 slots
+  EyeLight g_EL;
+};
+
+cbuffer cb_5 : register(b5) {
+  float4 cb_eye_pos4;
+};
+
+cbuffer cb_6 : register(b6) {
+  float4 cb_a;
+  float4 cb_b;
+};
+
+cbuffer cb_7 : register(b7) {
+  float4 cb_c;
+};
+
 struct LIGHT {
   float4 test;
   float4 amb;
@@ -108,7 +131,8 @@ PS_OUTPUT main(PS_INPUT psi)
 {
   PS_OUTPUT pso;
 
-  float4 eye_pos4 = float4(0.0f, 0.0f, 0.0f, 1.0f);
+  float4 eye_pos4 = g_EL.eye_pos4;
+//  float4 eye_pos4 = float4(0.0f, 0.0f, 0.0f, 1.0f);
 
   LIGHT l[6]; // not use loop in HLSL
   l[0] = proc_light(normalize(psi.norm.xyz), eye_pos4.xyz, 0);
@@ -132,7 +156,15 @@ PS_OUTPUT main(PS_INPUT psi)
   s[5] = psi.spc * pow(l[5].a, l[5].vec4.w);
 //  s[5] = psi.spc * pow(l[5].a, 1.0f);
 
-  float r[6] = {0.8f, 0.8f, 0.8f, 0.8f, 0.0f, 0.0f}; // not use loop in HLSL
+//  float r[6] = g_EL.r; // not use loop in HLSL
+  float r[6]; // not use loop in HLSL
+  r[0] = cb_a.x;
+  r[1] = cb_a.y;
+  r[2] = cb_a.z;
+  r[3] = cb_a.w;
+  r[4] = 0.0f; // cb_c.x; // cb_b.x;
+  r[5] = 0.0f; // cb_c.y; // cb_b.y;
+//  float r[6] = {0.8f, 0.8f, 0.8f, 0.8f, 0.0f, 0.0f}; // not use loop in HLSL
   float a = min(1.0f, r[0] * l[0].a + r[1] * l[1].a + r[2] * l[2].a
     + r[3] * l[3].a + r[4] * l[4].a + r[5] * l[5].a);
   float4 amb = min(1.0f, r[0] * l[0].amb + r[1] * l[1].amb + r[2] * l[2].amb
@@ -150,5 +182,7 @@ PS_OUTPUT main(PS_INPUT psi)
   pso.color0 = dc * psi.dif * a + ss + amb;
 //  pso.color0 = test0; // test by light 0 direction or specular
 //  pso.color0 = test1; // test by light 1 direction or specular
+//  pso.color0 = g_EL.eye_pos4; // test by constant buffer
+//  pso.color0 = float4(r[0], r[1], r[2], r[3]); // test by constant buffer
   return pso;
 }
