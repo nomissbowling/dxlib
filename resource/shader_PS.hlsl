@@ -23,8 +23,11 @@ struct DX_D3D11_PS_CONST_BUFFER_BASE {
   float AlphaTestRef; // alpha test compare with it
   float2 Padding1;
   int AlphaTestCmpMode; // alpha test mode (DX_CMP_NEVER etc)
-  int3 Padding2;
+  int NoLightAngleAttenuation; // 0: attenuation, 1: no attenuation
+  int UseHalfLambert; // half lambert mode (20240324 later)
+  int Padding2;
   float4 IgnoreTextureColor; // color when ignore texture
+  float4 DrawAddColor; // add color
 };
 
 struct DX_D3D11_PS_CONST_SHADOWMAP {
@@ -52,6 +55,14 @@ cbuffer cbD3D11_CONST_BUFFER_PS_SHADOWMAP : register(b2) {
   DX_D3D11_PS_CONST_BUFFER_SHADOWMAP g_ShadowMap;
 };
 
+// DX_D3D11_PS_CONST_FILTER_SIZE 1280
+// cbuffer cbD3D11_CONST_BUFFER_PS_FILTER : register(b3) {
+//   DX_D3D11_PS_CONST_BUFFER_FILTER g_Filter;
+// };
+cbuffer cbD3D11_CONST_BUFFER_PS_FILTER : register(b3) {
+  float4 g_Filter[1280 / 4 / 4]; // length will be changed (dummy)
+};
+
 SamplerState g_DiffuseMapSampler : register(s0);
 Texture2D g_DiffuseMapTexture : register(t0);
 
@@ -67,18 +78,8 @@ float4 g_Arr[4] = {
 float4 g_Reg0 : register(c0);
 float4 g_Reg1 : register(c1);
 
-struct EyeLight {
-  float4 eye_pos4;
-  float r[6];
-  float2 padding;
-};
-
-cbuffer cb_EyeLight : register(b3) { // max 14 slots
-  EyeLight g_EL;
-};
-
 cbuffer cb_5 : register(b5) {
-  float4 cb_eye_pos4;
+  float4 cb_cam_pos4;
 };
 
 cbuffer cb_6 : register(b6) {
@@ -88,6 +89,17 @@ cbuffer cb_6 : register(b6) {
 
 cbuffer cb_7 : register(b7) {
   float4 cb_c;
+};
+
+struct CamLight {
+  float4 cam_pos4;
+  float4 cam_lat4;
+  float4 r0;
+  float4 r1;
+};
+
+cbuffer cb_CamLight : register(b8) { // max 14 slots
+  CamLight g_CL;
 };
 
 struct LIGHT {
@@ -127,20 +139,54 @@ LIGHT proc_light(float3 n, float3 lookat, int lh)
   return l;
 }
 
+float m_a(float r[6], LIGHT l[6], int i)
+{
+  return max(0.0f, r[i] * l[i].a);
+}
+
+float dot_a(float r[6], LIGHT l[6])
+{
+  return m_a(r, l, 0) + m_a(r, l, 1) + m_a(r, l, 2)
+    + m_a(r, l, 3) + m_a(r, l, 4) + m_a(r, l, 5);
+}
+
+float4 m_amb(float r[6], LIGHT l[6], int i)
+{
+  return max(0.0f, r[i] * l[i].amb);
+}
+
+float4 dot_amb(float r[6], LIGHT l[6])
+{
+  return m_amb(r, l, 0) + m_amb(r, l, 1) + m_amb(r, l, 2)
+    + m_amb(r, l, 3) + m_amb(r, l, 4) + m_amb(r, l, 5);
+}
+
+float m_s(float r[6], float4 s[6], int i)
+{
+  return max(0.0f, r[i] * s[i]);
+}
+
+float4 dot_s(float r[6], float4 s[6])
+{
+  return m_s(r, s, 0) + m_s(r, s, 1) + m_s(r, s, 2)
+    + m_s(r, s, 3) + m_s(r, s, 4) + m_s(r, s, 5);
+}
+
 PS_OUTPUT main(PS_INPUT psi)
 {
   PS_OUTPUT pso;
 
-  float4 eye_pos4 = g_EL.eye_pos4;
-//  float4 eye_pos4 = float4(0.0f, 0.0f, 0.0f, 1.0f);
+  float3 norm = psi.norm.xyz;
+  float3 lat = g_CL.cam_lat4.xyz - g_CL.cam_pos4.xyz;
+//  float3 lat = float3(0.0f, 0.0f, 0.0f);
 
   LIGHT l[6]; // not use loop in HLSL
-  l[0] = proc_light(normalize(psi.norm.xyz), eye_pos4.xyz, 0);
-  l[1] = proc_light(normalize(psi.norm.xyz), eye_pos4.xyz, 1);
-  l[2] = proc_light(normalize(psi.norm.xyz), eye_pos4.xyz, 2);
-  l[3] = proc_light(normalize(psi.norm.xyz), eye_pos4.xyz, 3);
-  l[4] = proc_light(normalize(psi.norm.xyz), eye_pos4.xyz, 4);
-  l[5] = proc_light(normalize(psi.norm.xyz), eye_pos4.xyz, 5);
+  l[0] = proc_light(normalize(norm), lat, 0);
+  l[1] = proc_light(normalize(norm), lat, 1);
+  l[2] = proc_light(normalize(norm), lat, 2);
+  l[3] = proc_light(normalize(norm), lat, 3);
+  l[4] = proc_light(normalize(norm), lat, 4);
+  l[5] = proc_light(normalize(norm), lat, 5);
 
   float4 s[6]; // not use loop in HLSL
   s[0] = psi.spc * pow(l[0].a, l[0].vec4.w);
@@ -156,21 +202,17 @@ PS_OUTPUT main(PS_INPUT psi)
   s[5] = psi.spc * pow(l[5].a, l[5].vec4.w);
 //  s[5] = psi.spc * pow(l[5].a, 1.0f);
 
-//  float r[6] = g_EL.r; // not use loop in HLSL
   float r[6]; // not use loop in HLSL
-  r[0] = cb_a.x;
-  r[1] = cb_a.y;
-  r[2] = cb_a.z;
-  r[3] = cb_a.w;
-  r[4] = 0.0f; // cb_c.x; // cb_b.x;
-  r[5] = 0.0f; // cb_c.y; // cb_b.y;
+  r[0] = g_CL.r0.x;
+  r[1] = g_CL.r0.y;
+  r[2] = g_CL.r0.z;
+  r[3] = g_CL.r0.w;
+  r[4] = g_CL.r1.x;
+  r[5] = g_CL.r1.y;
 //  float r[6] = {0.8f, 0.8f, 0.8f, 0.8f, 0.0f, 0.0f}; // not use loop in HLSL
-  float a = min(1.0f, r[0] * l[0].a + r[1] * l[1].a + r[2] * l[2].a
-    + r[3] * l[3].a + r[4] * l[4].a + r[5] * l[5].a);
-  float4 amb = min(1.0f, r[0] * l[0].amb + r[1] * l[1].amb + r[2] * l[2].amb
-    + r[3] * l[3].amb + r[4] * l[4].amb + r[5] * l[5].amb);
-  float4 ss = min(1.0f, r[0] * s[0] + r[1] * s[1] + r[2] * s[2]
-    + r[3] * s[3] + r[4] * s[4] + r[5] * s[5]);
+  float a = min(1.0f, dot_a(r, l));
+  float4 amb = min(1.0f, dot_amb(r, l));
+  float4 ss = min(1.0f, dot_s(r, s));
 
   // texture diffused color
   float4 dc = g_DiffuseMapTexture.Sample(g_DiffuseMapSampler, psi.texCoords0);
@@ -182,7 +224,7 @@ PS_OUTPUT main(PS_INPUT psi)
   pso.color0 = dc * psi.dif * a + ss + amb;
 //  pso.color0 = test0; // test by light 0 direction or specular
 //  pso.color0 = test1; // test by light 1 direction or specular
-//  pso.color0 = g_EL.eye_pos4; // test by constant buffer
+//  pso.color0 = g_CL.cam_pos4; // test by constant buffer
 //  pso.color0 = float4(r[0], r[1], r[2], r[3]); // test by constant buffer
   return pso;
 }
