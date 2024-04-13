@@ -37,7 +37,7 @@ pub trait Tr {
 /// for DX11 and DX9
 pub trait Ts: Tr {
   /// for DX11
-  fn set_const(&self, cb: &ConstantBuffer, slot: i32) -> i32;
+  fn set_const(&self, cb: &ConstantBuffer) -> i32;
   /// must end 0 (for DX9)
   fn get_const_default_param_f_to_shader(&self, n: &str) -> *const FLOAT4 {
     unsafe { GetConstDefaultParamFToShader(n.as_ptr(), self.handle()) }
@@ -176,8 +176,9 @@ impl Tdx {
 
   /// for DX11
   /// - n: number of FLOAT4 (alloc n * 4 * sizeof f32)
-  pub fn create_constant_buffer(&mut self, n: i32) -> ConstantBuffer {
-    self.reg(Box::new(ConstantBuffer::create(n)))
+  /// - s: slot
+  pub fn create_constant_buffer(&mut self, n: i32, s: i32) -> ConstantBuffer {
+    self.reg(Box::new(ConstantBuffer::create(n, s)))
     .borrow().as_constant_buffer()
   }
 

@@ -10,14 +10,16 @@ pub struct ConstantBuffer {
   /// handle
   pub h: i32,
   /// n: number of FLOAT4 (alloc n * 4 * sizeof f32)
-  pub n: i32
+  pub n: i32,
+  /// s: slot on the shader
+  pub s: i32
 }
 
 /// Tr for ConstantBuffer
 impl Tr for ConstantBuffer {
   /// as constant buffer
   fn as_constant_buffer(&self) -> ConstantBuffer {
-    ConstantBuffer{d: false, h: self.h, n: self.n}
+    ConstantBuffer{d: false, h: self.h, n: self.n, s: self.s}
   }
 
   /// handle
@@ -41,9 +43,10 @@ impl Drop for ConstantBuffer {
 impl ConstantBuffer {
   /// create
   /// - n: number of FLOAT4 (alloc n * 4 * sizeof f32)
-  pub fn create(n: i32) -> Self {
+  /// - s: slot
+  pub fn create(n: i32, s: i32) -> Self {
     let sz = n * std::mem::size_of::<FLOAT4>() as i32;
-    ConstantBuffer{d: true, h: unsafe { CreateShaderConstantBuffer(sz) }, n}
+    ConstantBuffer{d: true, h: unsafe { CreateShaderConstantBuffer(sz) }, n, s}
   }
   /// as slice mut
   pub fn as_slice_mut(&self) -> &mut [FLOAT4] {
@@ -57,8 +60,9 @@ impl ConstantBuffer {
   pub fn update(&self) -> i32 {
     unsafe { UpdateShaderConstantBuffer(self.h) }
   }
-  /// set to slot
+  /// set to slot (use shader.set_const(&cb) instead of this inner function)
   /// - ts: DX_SHADERTYPE_VERTEX DX_SHADERTYPE_PIXEL etc
+  /// - slot: any slot or cb.s
   pub fn set_to_slot(&self, ts: i32, slot: i32) -> i32 {
     unsafe { SetShaderConstantBuffer(self.h, ts, slot) }
   }
@@ -93,8 +97,8 @@ impl Tr for VertexShader {
 /// Ts for VertexShader
 impl Ts for VertexShader {
   /// for DX11
-  fn set_const(&self, cb: &ConstantBuffer, slot: i32) -> i32 {
-    cb.set_to_slot(DX_SHADERTYPE_VERTEX, slot)
+  fn set_const(&self, cb: &ConstantBuffer) -> i32 {
+    cb.set_to_slot(DX_SHADERTYPE_VERTEX, cb.s)
   }
 }
 
@@ -145,8 +149,8 @@ impl Tr for PixelShader {
 /// Ts for PixelShader
 impl Ts for PixelShader {
   /// for DX11
-  fn set_const(&self, cb: &ConstantBuffer, slot: i32) -> i32 {
-    cb.set_to_slot(DX_SHADERTYPE_PIXEL, slot)
+  fn set_const(&self, cb: &ConstantBuffer) -> i32 {
+    cb.set_to_slot(DX_SHADERTYPE_PIXEL, cb.s)
   }
 }
 
@@ -197,8 +201,8 @@ impl Tr for GeometryShader {
 /// Ts for GeometryShader
 impl Ts for GeometryShader {
   /// for DX11
-  fn set_const(&self, cb: &ConstantBuffer, slot: i32) -> i32 {
-    cb.set_to_slot(DX_SHADERTYPE_GEOMETRY, slot)
+  fn set_const(&self, cb: &ConstantBuffer) -> i32 {
+    cb.set_to_slot(DX_SHADERTYPE_GEOMETRY, cb.s)
   }
 }
 

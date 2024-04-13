@@ -110,17 +110,17 @@ pub fn screen(p: &str) -> Result<(), Box<dyn Error>> {
   // cbp slot 4 cb_Test(f4 g_Test, f4[4] g_Arr)
   // cbg slot none
   // cb5 slot 5 cb_5(f4 cb_cam_pos4)
-  // cb6 slot 6 cb_6(f4 cb_a, cb_b)
+  // cb6 slot 6 cb_6(f4 cb_a, f4 cb_b)
   // cb7 slot 7 cb_7(f4 cb_c)
-  // cb8 slot 8 cb_CamLight(CamLight g_CL(f4 cam_pos4, cam_lat4, r0, r1))
+  // cb8 slot 8 cb_CamLight(CamLight g_CL(f4 cam_pos4, f4 cam_lat4, f4[2] r))
   init_shader_constant_buffer(); // DX11
-  let cbv = dx.create_constant_buffer(5);
-  let cbp = dx.create_constant_buffer(5);
-  let cbg = dx.create_constant_buffer(0);
-  let cb5 = dx.create_constant_buffer(1);
-  let cb6 = dx.create_constant_buffer(2);
-  let cb7 = dx.create_constant_buffer(1);
-  let cb8 = dx.create_constant_buffer(4);
+  let cbv = dx.create_constant_buffer(5, 4);
+  let cbp = dx.create_constant_buffer(5, 4);
+  let cbg = dx.create_constant_buffer(0, 0);
+  let cb5 = dx.create_constant_buffer(1, 5);
+  let cb6 = dx.create_constant_buffer(2, 6);
+  let cb7 = dx.create_constant_buffer(1, 7);
+  let cb8 = dx.create_constant_buffer(4, 8);
   println!("cbv: {:08x}, cbp: {:08x} cbg: {:08x}",
     cbv.handle(), cbp.handle(), cbg.handle());
   println!("cb5: {:08x}, cb6: {:08x} cb7: {:08x} cb8: {:08x}",
@@ -287,27 +287,27 @@ pub fn screen(p: &str) -> Result<(), Box<dyn Error>> {
       proc_cb("b_cb8", b_cb8);
     }
     cbv.update();
-    shv.set_const(&cbv, 4);
+    shv.set_const(&cbv);
     cbp.update();
-    shp.set_const(&cbp, 4);
+    shp.set_const(&cbp);
     cbg.update();
-    shg.set_const(&cbg, 0);
+    shg.set_const(&cbg);
     b_cb5[0] = FLOAT4::new(0.0, 0.0, 0.0, 1.0); // cb_cam_pos4
     cb5.update();
-    shp.set_const(&cb5, 5);
+    shp.set_const(&cb5);
     b_cb6[0] = FLOAT4::new(0.8, 0.8, 0.8, 0.8); // cb_a
     b_cb6[1] = FLOAT4::new(0.0, 0.0, 0.0, 0.0); // cb_b
     cb6.update();
-    shp.set_const(&cb6, 6);
+    shp.set_const(&cb6);
     b_cb7[0] = FLOAT4::new(0.0, 0.0, 0.0, 0.0); // cb_c
     cb7.update();
-    shp.set_const(&cb7, 7);
+    shp.set_const(&cb7);
     b_cb8[0] = FLOAT4::new(0.0, 0.0, 0.0, 1.0); // g_CL.cam_pos4
     b_cb8[1] = FLOAT4::new(0.0, 0.0, 0.0, 1.0); // g_CL.cam_lat4
-    b_cb8[2] = FLOAT4::new(0.8, 0.8, 0.8, 0.8); // g_CL.r0
-    b_cb8[3] = FLOAT4::new(0.0, 0.0, 0.0, 0.0); // g_CL.r1
+    b_cb8[2] = FLOAT4::new(0.8, 0.8, 0.8, 0.8); // g_CL.r[0]
+    b_cb8[3] = FLOAT4::new(0.0, 0.0, 0.0, 0.0); // g_CL.r[1]
     cb8.update();
-    shp.set_const(&cb8, 8);
+    shp.set_const(&cb8);
 /*
     // for DX9
     set_ps_const_f(VecL0, COLOR_F::get(&[1.0, 1.0, 1.0, 1.0]).as_float4());
