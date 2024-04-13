@@ -112,10 +112,10 @@ struct LIGHT {
 LIGHT proc_light(PS_INPUT psi, int lh)
 {
   float3 n = normalize(psi.norm.xyz);
-  float3 lookat = g_CL.cam_lat4.xyz - g_CL.cam_pos4.xyz;
-//  float3 lookat = psi.ppos.xyz - g_CL.cam_pos4.xyz;
-//  float3 lookat = psi.pos.xyz - g_CL.cam_pos4.xyz;
-//  float3 lookat = float3(0.0f, 0.0f, 0.0f);
+  float3 look_vec = g_CL.cam_lat4.xyz - g_CL.cam_pos4.xyz;
+//  float3 look_vec = psi.ppos.xyz - g_CL.cam_pos4.xyz;
+//  float3 look_vec = psi.pos.xyz - g_CL.cam_pos4.xyz;
+//  float3 look_vec = float3(0.0f, 0.0f, 0.0f);
 
   DX_D3D11_CONST_LIGHT light = g_Common.Light[lh];
   float4 light_amb = light.Ambient;
@@ -130,17 +130,21 @@ LIGHT proc_light(PS_INPUT psi, int lh)
   test.xyz = light.Specular;
   test.w = 1.0f;
 
-//  float3 light_dir = normalize(light_vec4.xyz);
+  float3 light_dir = normalize(light_vec4.xyz);
 //  float3 light_dir = normalize(float3(1.0f, 1.0f, 1.0f)); // test
 
-//  float3 e = normalize(lookat - psi.norm.xyz); // pos ppos
-//  float3 e = normalize(lookat);
-//  float3 r = normalize(lookat + light_vec4.xyz);
-  float3 r = -normalize(lookat + light_vec4.xyz);
-//  float3 r = normalize(lookat + light_dir);
-//  float3 r = -normalize(lookat + light_dir);
-//  float3 r = -normalize(light_dir);
-  float a = max(0.0f, dot(r, n));
+//  float3 e = normalize(look_vec - psi.norm.xyz); // pos ppos
+//  float3 e = normalize(look_vec);
+//  float3 r = normalize(look_vec + light_vec4.xyz);
+//  float3 r = -normalize(look_vec + light_vec4.xyz);
+//  float3 r = normalize(look_vec + light_dir);
+//  float3 r = -normalize(look_vec + light_dir);
+  float3 r = -normalize(light_dir);
+  float a = dot(-normalize(look_vec), normalize(dot(r, n) * n));
+//  float a = max(0.0f, dot(-normalize(look_vec), max(0.0f, normalize(dot(r, n) * n))));
+//  float a = max(0.0f, dot(-normalize(look_vec), normalize(max(0.0f, dot(r, n)) * n)));
+//  float a = max(0.0f, dot(-normalize(look_vec), n)) * max(0.0f, dot(r, n));
+//  float a = max(0.0f, dot(r, n));
   float4 spc = psi.spc * pow(a, light_vec4.w);
 //  float4 spc = psi.spc * pow(a, 1.0f);
   LIGHT l = {test, light_amb, spc, a, float3(0.0f, 0.0f, 0.0f)};

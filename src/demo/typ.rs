@@ -276,6 +276,32 @@ pub fn screen(p: &str) -> Result<(), Box<dyn Error>> {
         "g_Common\0", "g_Base\0", "g_ShadowMap\0", "g_Filter", "g_CL\0"]);
 */
     }
+
+    // after set_draw_screen
+    let r = 512.0f32;
+    let t = tick as f32 * m_pi / 180.0;
+    let c = t.cos();
+    let s = t.sin();
+    let p = (((tick / 4) % 91) - 45) as f32 * m_pi / 180.0;
+    let rc = r * p.cos();
+    let rs = r * p.sin();
+    let cam_pos = VECTOR::new(rc * c, rc * s, rs);
+    let cam_lookat = VECTOR::new(0.0, 0.0, 0.0);
+    let cam_z = VECTOR::new(0.0, 0.0, 1.0); // 0 0 1
+    let mut mv_cam = MATRIX::identity();
+    create_look_at_matrix(&mut mv_cam, &cam_pos, &cam_lookat, &cam_z);
+    // set_camera_near_far(0.1, 10000.0);
+    set_camera_view_matrix(mv_cam); // MTranspose (GL<->DX)
+    let mp_cam = get_camera_projection_matrix();
+    set_transform_to_projection(&mp_cam);
+    // let mut mp = MATRIX::identity();
+    // get_transform_to_projection_matrix(&mut mp);
+    // create_perspective_fov_matrix(&mut mp, fov, zn, zf, aspect);
+    // set_transform_to_projection(&mp);
+    // let mut mv = MATRIX::identity();
+    // create_viewport_matrix(&mut mv, cx, cy, w, h);
+    // set_transform_to_viewport(&mv);
+
     // for DX11
     if tick <= 1 {
       proc_cb("b_cbv", b_cbv);
@@ -302,7 +328,7 @@ pub fn screen(p: &str) -> Result<(), Box<dyn Error>> {
     b_cb7[0] = FLOAT4::new(0.0, 0.0, 0.0, 0.0); // cb_c
     cb7.update();
     shp.set_const(&cb7);
-    b_cb8[0] = FLOAT4::new(0.0, 0.0, 0.0, 1.0); // g_CL.cam_pos4
+    b_cb8[0] = FLOAT4::new(rc * c, rc * s, rs, 1.0); // g_CL.cam_pos4
     b_cb8[1] = FLOAT4::new(0.0, 0.0, 0.0, 1.0); // g_CL.cam_lat4
     b_cb8[2] = FLOAT4::new(0.8, 0.8, 0.8, 0.8); // g_CL.r[0]
     b_cb8[3] = FLOAT4::new(0.0, 0.0, 0.0, 0.0); // g_CL.r[1]
@@ -313,31 +339,6 @@ pub fn screen(p: &str) -> Result<(), Box<dyn Error>> {
     set_ps_const_f(VecL0, COLOR_F::get(&[1.0, 1.0, 1.0, 1.0]).as_float4());
     set_ps_const_f(PosL0, COLOR_F::get(&[0.0, 0.0, 0.0, 1.0]).as_float4());
 */
-
-    // after set_draw_screen
-    let r = 512.0f32;
-    let t = tick as f32 * m_pi / 180.0;
-    let c = t.cos();
-    let s = t.sin();
-    let p = (((tick / 4) % 91) - 45) as f32 * m_pi / 180.0;
-    let rc = r * p.cos();
-    let rs = r * p.sin();
-    let cam_pos = VECTOR::new(rc * c, rc * s, rs);
-    let cam_lookat = VECTOR::new(0.0, 0.0, 0.0);
-    let cam_z = VECTOR::new(0.0, 0.0, 1.0); // 0 0 1
-    let mut mv_cam = MATRIX::identity();
-    create_look_at_matrix(&mut mv_cam, &cam_pos, &cam_lookat, &cam_z);
-    // set_camera_near_far(0.1, 10000.0);
-    set_camera_view_matrix(mv_cam); // MTranspose (GL<->DX)
-    let mp_cam = get_camera_projection_matrix();
-    set_transform_to_projection(&mp_cam);
-    // let mut mp = MATRIX::identity();
-    // get_transform_to_projection_matrix(&mut mp);
-    // create_perspective_fov_matrix(&mut mp, fov, zn, zf, aspect);
-    // set_transform_to_projection(&mp);
-    // let mut mv = MATRIX::identity();
-    // create_viewport_matrix(&mut mv, cx, cy, w, h);
-    // set_transform_to_viewport(&mv);
 
     draw_line_3d(VECTOR::zeros(), VECTOR::new(-512.0, 0.0, 0.0), col[7]);
     draw_line_3d(VECTOR::zeros(), VECTOR::new(0.0, -512.0, 0.0), col[7]);
