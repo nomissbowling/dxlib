@@ -330,8 +330,8 @@ pub fn screen(p: &str) -> Result<(), Box<dyn Error>> {
     shp.set_const(&cb7);
     b_cb8[0] = FLOAT4::new(rc * c, rc * s, rs, 1.0); // g_CL.cam_pos4
     b_cb8[1] = FLOAT4::new(0.0, 0.0, 0.0, 1.0); // g_CL.cam_lat4
-    b_cb8[2] = FLOAT4::new(0.8, 0.8, 0.8, 0.8); // g_CL.r[0]
-    b_cb8[3] = FLOAT4::new(0.0, 0.0, 0.0, 0.0); // g_CL.r[1]
+    b_cb8[2] = FLOAT4::new(0.8, 0.8, 0.8, 0.8); // g_CL.r[0] (light ratio)
+    b_cb8[3] = FLOAT4::new(0.0, 0.0, 0.0, 1.0); // g_CL.r[1] (w: camera angle)
     cb8.update();
     shp.set_const(&cb8);
 /*

@@ -94,7 +94,7 @@ cbuffer cb_7 : register(b7) {
 struct CamLight {
   float4 cam_pos4;
   float4 cam_lat4;
-  float4 r[2];
+  float4 r[2]; // light ratio: (r[0].xyzw and r[1].xy), camera angle: r[1].w
 };
 
 cbuffer cb_CamLight : register(b8) { // max 14 slots
@@ -113,9 +113,7 @@ LIGHT proc_light(PS_INPUT psi, int lh)
 {
   float3 n = normalize(psi.norm.xyz);
   float3 look_vec = g_CL.cam_lat4.xyz - g_CL.cam_pos4.xyz;
-//  float3 look_vec = psi.ppos.xyz - g_CL.cam_pos4.xyz;
-//  float3 look_vec = psi.pos.xyz - g_CL.cam_pos4.xyz;
-//  float3 look_vec = float3(0.0f, 0.0f, 0.0f);
+//  float3 look_vec = float3(0.0f, 0.0f, 0.0f); // test
 
   DX_D3D11_CONST_LIGHT light = g_Common.Light[lh];
   float4 light_amb = light.Ambient;
@@ -133,18 +131,14 @@ LIGHT proc_light(PS_INPUT psi, int lh)
   float3 light_dir = normalize(light_vec4.xyz);
 //  float3 light_dir = normalize(float3(1.0f, 1.0f, 1.0f)); // test
 
-//  float3 e = normalize(look_vec - psi.norm.xyz); // pos ppos
-//  float3 e = normalize(look_vec);
-//  float3 r = normalize(look_vec + light_vec4.xyz);
-//  float3 r = -normalize(look_vec + light_vec4.xyz);
-//  float3 r = normalize(look_vec + light_dir);
-//  float3 r = -normalize(look_vec + light_dir);
   float3 r = -normalize(light_dir);
-  float a = dot(-normalize(look_vec), normalize(dot(r, n) * n));
-//  float a = max(0.0f, dot(-normalize(look_vec), max(0.0f, normalize(dot(r, n) * n))));
-//  float a = max(0.0f, dot(-normalize(look_vec), normalize(max(0.0f, dot(r, n)) * n)));
-//  float a = max(0.0f, dot(-normalize(look_vec), n)) * max(0.0f, dot(r, n));
-//  float a = max(0.0f, dot(r, n));
+  float3 v = -normalize(look_vec);
+  float2 p = float2(
+    max(0.0f, dot(r, n)), // not use camera angle
+    dot(v, normalize(dot(r, n) * n))); // both rev. (- * - = +) hide by culling
+//  max(0.0f, dot(v, n)) * max(0.0f, dot(r, n))
+  float q = g_CL.r[1].w;
+  float a = dot(float2(1.0f - q, q), p);
   float4 spc = psi.spc * pow(a, light_vec4.w);
 //  float4 spc = psi.spc * pow(a, 1.0f);
   LIGHT l = {test, light_amb, spc, a, float3(0.0f, 0.0f, 0.0f)};
