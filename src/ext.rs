@@ -52,9 +52,10 @@ pub fn calc_norm(vs: &mut Vec<VERTEX3DSHADER>, nf: bool) {
       a.x * b.y - a.y * b.x];
     let n = match nf {
     true => { // normalize
-      let mut d = v.iter().map(|&p| p * p).sum::<f32>();
+      let mut d = v.iter().map(|&p| p * p).sum::<f32>().sqrt();
       if d < 0.000001 { d = 1.0 };
-      VECTOR::get(&[v[0] / d, v[1] / d, v[2] / d])
+      let e = v.iter().map(|&p| p / d).collect::<Vec<_>>().try_into().unwrap();
+      VECTOR::get(&e)
     },
     false => VECTOR::get(&v) // auto calc normalize(norm) later by HLSL
     };

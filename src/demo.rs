@@ -164,25 +164,25 @@ pub fn gen_vt<F: Float>(phf: PHF<F>) -> Vec<Vec<Vec<VT>>> {
 
 /// icosahedron (gl order)
 pub fn gen_icosahedron(tf: bool) -> Vec<Vec<Vec<VT>>> {
-  gen_vt(Icosahedron::new(1.0f32).with_uv(tf))
+  gen_vt(Icosahedron::new(1.0f32).ph.with_uv(tf))
 }
 
 /// dodecahedron (gl order)
 pub fn gen_dodecahedron(tf: bool) -> Vec<Vec<Vec<VT>>> {
-  gen_vt(Dodecahedron::new(1.0f32).with_uv(tf))
+  gen_vt(Dodecahedron::new(1.0f32).ph.with_uv(tf))
 }
 
 /// dodecahedron center (gl order)
 pub fn gen_dodecahedron_center(tf: bool) -> Vec<Vec<Vec<VT>>> {
-  gen_vt(DodecahedronCenter::new(1.0f32).with_uv(tf))
+  gen_vt(DodecahedronCenter::new(1.0f32).ph.with_uv(tf))
 }
 
 /// c60 (gl order)
 pub fn gen_c60(tf: bool) -> Vec<Vec<Vec<VT>>> {
-  gen_vt(C60::new(1.0f32).with_uv(tf))
+  gen_vt(C60::new(1.0f32).ph.with_uv(tf))
 }
 
 /// c60 center (gl order)
 pub fn gen_c60_center(tf: bool) -> Vec<Vec<Vec<VT>>> {
-  gen_vt(C60Center::new(1.0f32).with_uv(tf))
+  gen_vt(C60Center::new(1.0f32).ph.with_uv(tf))
 }
