@@ -67,7 +67,7 @@ pub fn screen(p: &str) -> Result<(), Box<dyn Error>> {
   let res: Vec<String> = vec![
     "Fantasie_Impromptu_op66.mid\0",
     "onestop.mid\0",
-    "ringout.wav\0",
+    "ringout.wav\0", // "_SoranoCanvas_HiiragiHanon_loop.mp3\0",
     "_decision3_.wav\0",
     "_img_320x240_0000.png\0",
     "_texture_128x128_0000.bmp\0",

@@ -18,6 +18,7 @@ readme = "README.md"
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
-Fullerene = { version = "0.2" } # "0.2.3"
+polyhedron-faces = { version = "0.3" }
+Fullerene = { version = "0.3" } # "0.3.0"
 
 num = { version = "0.4" } # "0.4.1"

@@ -7,6 +7,7 @@ use fullerene::c60::{C60, C60Center};
 use fullerene::dodecahedron::{Dodecahedron, DodecahedronCenter};
 use fullerene::icosahedron::Icosahedron;
 use fullerene::{PHF, TUV, f_to_f32}; // f_to_f64
+use ph_faces::FTVI; // fullerene::polyhedron::FTVI;
 use num::Float;
 
 pub mod dum;
@@ -153,7 +154,7 @@ pub fn gen_any_face() -> Vec<Vec<VT>> {
 pub fn gen_vt<F: Float>(phf: PHF<F>) -> Vec<Vec<Vec<VT>>> {
   phf.iter().map(|f|
     f.iter().map(|v|
-      v.iter().map(|(p, uv)| {
+      v.iter().map(|FTVI::<F>{fi: _, ti: _, vi: _, idx: _, p, uv}| {
         let p = f_to_f32(p);
         let uv = f_to_f32(uv);
         VT::get(&[p[0], p[1], p[2], 1.0], &[uv[0], uv[1]])
